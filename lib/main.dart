@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
 //        textTheme: Theme.of(context).textTheme,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: HomeScreen(),
+      home: LoginScreen(),
     );
   }
 }

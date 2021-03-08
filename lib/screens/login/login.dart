@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:note_app/screens/home/home.dart';
 
 class LoginScreen extends StatelessWidget {
   @override
@@ -82,9 +83,10 @@ class LoginScreen extends StatelessWidget {
               child: GestureDetector(
                 child: InkWell(
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text('Welcome to Paper Note'),
-                    ));
+//                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+//                      content: Text('Welcome to Paper Note'),
+//                    ));
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen()));
                   },
                   borderRadius: BorderRadius.circular(10),
                   child: Container(

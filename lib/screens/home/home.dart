@@ -15,47 +15,62 @@ class HomeScreenState extends State<HomeScreen> {
   String name;
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
-    return ListTile(
-      title: Container(
-        height: 90,
-        margin: const EdgeInsets.only(bottom: 5),
-        padding: const EdgeInsets.all(10),
-        decoration: new BoxDecoration(
-          color: Color(0xffffab91),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              child: Text(
-                document['title'],
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 20,
-                ),
+    return GestureDetector(
+      child: Container(
+
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 8, right: 10, left: 10),
+              padding: const EdgeInsets.only(
+                top: 22,
+                left: 20,
+                bottom: 15,
+                right: 20,
+              ),
+              decoration: new BoxDecoration(
+                color: Color(int.parse(document['color'])).withOpacity(.77),
+//                border: Border.all(color: Color(0xffe8e8e8)),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    child: Text(
+                      document['title'],
+                      style: TextStyle(
+                        color: Color(0xff1b1c17),
+                        fontSize: 22,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    alignment: Alignment.centerRight,
+                    margin: EdgeInsets.only(top: 3,),
+                    child: Text(
+                      'March 7, 2020',
+                      style: TextStyle(
+                        color: Color(0xff1b1c17).withOpacity(.5),
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            Container(
-              // margin: const EdgeInsets.only(top: 9.5),
-              child: Text(
-                document['text'],
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 15,
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
-      )
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xff252525),
+//      backgroundColor: Color(0xff252525),
+      backgroundColor: Colors.white,
       body: Container(
         child: Column(
           children: <Widget>[
@@ -65,7 +80,7 @@ class HomeScreenState extends State<HomeScreen> {
                 left: 17,
                 right: 17,
               ),
-              height: 95,
+              height: 85,
               child: Stack(
 //                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -74,20 +89,22 @@ class HomeScreenState extends State<HomeScreen> {
                     child: Text(
                       "Notes",
                       style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
+//                        color: Colors.white,
+                        color: Colors.black,
+                        fontSize: 25,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
                   ),
                   Positioned(
-                      bottom: 12,
+                      bottom: 9,
                       right: 0,
 //                    margin: const EdgeInsets.only(bottom: 0),
                       child: GestureDetector(
                         child: Container(
                           decoration: new BoxDecoration(
-                            color: Color(0xff3b3b3b),
+//                            color: Color(0xff3b3b3b),
+//                            color: Color(0xffe8e8e8),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Material(
@@ -102,14 +119,15 @@ class HomeScreenState extends State<HomeScreen> {
                               child: Container(
                                 height: 40,
                                 width: 40,
-                                padding: const EdgeInsets.all(6),
+                                padding: const EdgeInsets.all(8),
                                 decoration: new BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Image(
                                   image: AssetImage(
                                       'assets/images/icon-search.png'),
-                                  color: Colors.white,
+//                                  color: Colors.white,
+                                  color: Colors.black,
                                   height: 20,
                                   width: 20,
                                 ),
@@ -124,18 +142,26 @@ class HomeScreenState extends State<HomeScreen> {
             ),
             Expanded(
               child: Container(
-                child: StreamBuilder(
-                  stream: FirebaseFirestore.instance.collection('test').snapshots(),
-                  builder: (context, snapshot) {
-                    if(!snapshot.hasData) return const Text('Loading...');
-                    return ListView.builder(
-                      itemExtent: 80.0,
-                      itemCount: snapshot.data.docs.length,
-                      itemBuilder: (context, index) => 
-                        _buildListItem(context, snapshot.data.docs[index]),
-                    );
-                  }
-                ),
+                child: ScrollConfiguration(
+                  behavior: ScrollBehavior(),
+                  child: GlowingOverscrollIndicator(
+                    axisDirection: AxisDirection.down,
+                    color: Colors.grey,
+                    child: StreamBuilder(
+                        stream: FirebaseFirestore.instance.collection('test').snapshots(),
+                        builder: (context, snapshot) {
+                          if(!snapshot.hasData) return const Text('Loading...');
+                          return ListView.builder(
+                            padding: EdgeInsets.zero,
+//                      itemExtent: 80.0,
+                            itemCount: snapshot.data.docs.length,
+                            itemBuilder: (context, index) =>
+                                _buildListItem(context, snapshot.data.docs[index]),
+                          );
+                        }
+                    ),
+                  ),
+                )
               ),
             ),
           ],
