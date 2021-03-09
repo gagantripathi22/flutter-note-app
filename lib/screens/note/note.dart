@@ -3,18 +3,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:animations/animations.dart';
 import 'package:note_app/screens/note/note.dart';
 
-class NoteScreen extends StatefulWidget {
-  @override
-  NoteScreenState createState() {
-    return NoteScreenState();
-  }
-}
+class NoteScreen extends StatelessWidget {
+  const NoteScreen({
+    Key key,
+    @required this.title, this.date, this.note,
+  }) : super(key: key);
 
-class NoteScreenState extends State<NoteScreen> {
-  String id;
-  final db = FirebaseFirestore.instance;
-  final _formKey = GlobalKey<FormState>();
-  String name;
+  final String title;
+  final String date;
+  final String note;
 
   @override
   Widget build(BuildContext context) {
@@ -119,72 +116,55 @@ class NoteScreenState extends State<NoteScreen> {
               ),
             ),
             Expanded(
-              child: Container(
-                padding: EdgeInsets.only(
-                  top: 10,
-                  bottom: 10,
-                  left: 20,
-                  right: 20,
+              child: SingleChildScrollView(
+                child: Container(
+                    padding: EdgeInsets.only(
+                      top: 10,
+                      bottom: 10,
+                      left: 20,
+                      right: 20,
+                    ),
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            // 'Bootyful weather app UI concepts we wish existed',
+                            title ,
+                            style: TextStyle(
+                                fontSize: 35,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500
+                            ),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(top: 12),
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            'Edited on '+ date,
+                            style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.white.withOpacity(.7),
+                                fontWeight: FontWeight.w400
+                            ),
+                          ),
+                        ),
+                        Container(
+                            alignment: Alignment.topLeft,
+                            margin: EdgeInsets.only(top: 9),
+                            child: Text(
+                              note,
+                              style: TextStyle(
+                                fontSize: 17.0,
+                                color: Colors.white,
+                                height: 1.8,
+                              ),
+                            ),
+                          ),
+                      ],
+                    )
                 ),
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        'Beautiful weather app UI concepts we wish existed',
-                        style: TextStyle(
-                            fontSize: 35,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 12),
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        'March 7, 2020',
-                        style: TextStyle(
-                            fontSize: 15,
-                            color: Colors.white.withOpacity(.7),
-                            fontWeight: FontWeight.w400
-                        ),
-                      ),
-                    ),
-//                    Expanded(
-//                      flex: 1,
-//                      child: new SingleChildScrollView(
-//                        scrollDirection: Axis.vertical,//.horizontal
-//                        child: new Text(
-//                          "1 Description that is too long in text format(Here Data is coming from API) jdlksaf j klkjjflkdsjfkddfdfsdfds " +
-//                              "2 Description that is too long in text format(Here Data is coming from API) d fsdfdsfsdfd dfdsfdsf sdfdsfsd d " +
-//                              "3 Description that is too long in text format(Here Data is coming from API)  adfsfdsfdfsdfdsf   dsf dfd fds fs" +
-//                              "4 Description that is too long in text format(Here Data is coming from API) dsaf dsafdfdfsd dfdsfsda fdas dsad" +
-//                              "5 Description that is too long in text format(Here Data is coming from API) dsfdsfd fdsfds fds fdsf dsfds fds " +
-//                              "6 Description that is too long in text format(Here Data is coming from API) asdfsdfdsf fsdf sdfsdfdsf sd dfdsf" +
-//                              "7 Description that is too long in text format(Here Data is coming from API) df dsfdsfdsfdsfds df dsfds fds fsd" +
-//                              "8 Description that is too long in text format(Here Data is coming from API)" +
-//                              "9 Description that is too long in text format(Here Data is coming from API)" +
-//                              "10 Description that is too long in text format(Here Data is coming from API)"
-//                                  "6 Description that is too long in text format(Here Data is coming from API) asdfsdfdsf fsdf sdfsdfdsf sd dfdsf" +
-//                              "7 Description that is too long in text format(Here Data is coming from API) df dsfdsfdsfdsfds df dsfds fds fsd" +
-//                              "8 Description that is too long in text format(Here Data is coming from API)" +
-//                              "9 Description that is too long in text format(Here Data is coming from API)" +
-//                              "10 Description that is too long in text format(Here Data is coming from API)"
-//                                  "6 Description that is too long in text format(Here Data is coming from API) asdfsdfdsf fsdf sdfsdfdsf sd dfdsf" +
-//                              "7 Description that is too long in text format(Here Data is coming from API) df dsfdsfdsfdsfds df dsfds fds fsd" +
-//                              "8 Description that is too long in text format(Here Data is coming from API)" +
-//                              "9 Description that is too long in text format(Here Data is coming from API)" +
-//                              "10 Description that is too long in text format(Here Data is coming from API)",
-//                          style: new TextStyle(
-//                            fontSize: 16.0, color: Colors.white,
-//                          ),
-//                        ),
-//                      ),
-//
-//                    )
-                  ],
-                )
               ),
             ),
           ],

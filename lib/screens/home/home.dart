@@ -16,6 +16,10 @@ class HomeScreenState extends State<HomeScreen> {
   final _formKey = GlobalKey<FormState>();
   String name;
 
+  Function _navigateToNote() {
+    ;
+  }
+
   Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
     return GestureDetector(
       child: Container(
@@ -78,7 +82,15 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     backgroundColor: Color(0xff252525),
+      floatingActionButton: FloatingActionButton.extended(
+        label: Text('New Note'),
+        icon: Icon(Icons.add),
+        backgroundColor: Color(0xff252525),
+        foregroundColor: Colors.white,
+        // tooltip: 'Upload',
+        onPressed: () => {},
+      ),
+      backgroundColor: Color(0xff252525),
       // backgroundColor: Colors.white,
       body: Container(
         child: Column(
@@ -175,8 +187,16 @@ class HomeScreenState extends State<HomeScreen> {
 //                                  transitionDuration: Duration(milliseconds: 2000),
 
                                   openColor: Color(0xff252525),
-                                  closedBuilder: (BuildContext c, VoidCallback action) => _buildListItem(context, snapshot.data.docs[index]),
-                                  openBuilder: (BuildContext c, VoidCallback action) => NoteScreen(),
+                                  closedBuilder: (context, action) {
+                                    return _buildListItem(context, snapshot.data.docs[index]);
+                                  },
+                                  openBuilder: (context, action) {
+                                    return NoteScreen(
+                                      title: snapshot.data.docs[index]['title'],
+                                      date: '7 March 2020',
+                                      note: snapshot.data.docs[index]['text']
+                                    );
+                                  },
                                   tappable: true,
                                 )
                           );
