@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:animations/animations.dart';
+import 'package:note_app/screens/note/note.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -29,9 +31,13 @@ class HomeScreenState extends State<HomeScreen> {
                 bottom: 11,
                 right: 15,
               ),
+              constraints: BoxConstraints(
+//                maxHeight: 100, minHeight: 80,
+              ),
               decoration: new BoxDecoration(
-                // color: Color(int.parse(document['color'])).withOpacity(1),
-                border: Border.all(color: Color(0xff525252)),
+                 color: Color(int.parse(document['color'])).withOpacity(.03),
+//                border: Border.all(color: Color(0xff525252.2),
+                border: Border.all(color: Color(int.parse(document['color'])).withOpacity(.7)),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Column(
@@ -95,13 +101,13 @@ class HomeScreenState extends State<HomeScreen> {
                       style: TextStyle(
 //                        color: Colors.white,
                         color: Colors.white,
-                        fontSize: 25,
+                        fontSize: 23,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
                   ),
                   Positioned(
-                      bottom: 5.5,
+                      bottom: 7,
                       right: 0,
 //                    margin: const EdgeInsets.only(bottom: 0),
                       child: GestureDetector(
@@ -121,8 +127,8 @@ class HomeScreenState extends State<HomeScreen> {
                                 ));
                               },
                               child: Container(
-                                height: 40,
-                                width: 40,
+                                height: 36,
+                                width: 36,
                                 padding: const EdgeInsets.all(8),
                                 decoration: new BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
@@ -160,7 +166,19 @@ class HomeScreenState extends State<HomeScreen> {
 //                      itemExtent: 80.0,
                             itemCount: snapshot.data.docs.length,
                             itemBuilder: (context, index) =>
-                                _buildListItem(context, snapshot.data.docs[index]),
+                                OpenContainer(
+//                                  closedBuilder: (context, action) (
+//                                    _buildListItem(context, snapshot.data.docs[index]),
+//                                  ),
+                                  closedColor: Color(0xff252525),
+                                  closedElevation: 0,
+//                                  transitionDuration: Duration(milliseconds: 2000),
+
+                                  openColor: Color(0xff252525),
+                                  closedBuilder: (BuildContext c, VoidCallback action) => _buildListItem(context, snapshot.data.docs[index]),
+                                  openBuilder: (BuildContext c, VoidCallback action) => NoteScreen(),
+                                  tappable: true,
+                                )
                           );
                         }
                     ),

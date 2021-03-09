@@ -5,7 +5,8 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+//      backgroundColor: Colors.white,
+      backgroundColor: Color(0xff252525),
       body: Container(
         child: Column(
           children: <Widget>[
@@ -44,7 +45,7 @@ class LoginScreen extends StatelessWidget {
                         child: Text(
                           "Welcome",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Colors.white,
                             fontSize: 40,
                             fontWeight: FontWeight.w600,
                           ),
@@ -56,7 +57,7 @@ class LoginScreen extends StatelessWidget {
                         child: Text(
                           "Sign up with Google account so we can sync your notes",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Colors.white,
                             fontSize: 18,
                           ),
                         ),
@@ -94,7 +95,7 @@ class LoginScreen extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 15, right: 15),
                     decoration: new BoxDecoration(
 //                  color: Color(0xffe8e8e8),
-                      border: Border.all(color: Color(0xffe8e8e8)),
+                      border: Border.all(color: Color(0xff4f4f4f)),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Row(
@@ -111,7 +112,7 @@ class LoginScreen extends StatelessWidget {
                           child: Text(
                             "Sign up with Google",
                             style: TextStyle(
-                              color: Colors.black,
+                              color: Colors.white,
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
                             ),
