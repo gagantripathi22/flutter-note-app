@@ -218,7 +218,7 @@ class HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton.extended(
         label: Text('New Note'),
         icon: Icon(Icons.add),
-        backgroundColor: Color(0xff252525),
+        backgroundColor: Color(0xff3b3b3b),
         foregroundColor: Colors.white,
         // tooltip: 'Upload',
         onPressed: () => {
