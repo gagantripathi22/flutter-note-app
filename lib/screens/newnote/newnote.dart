@@ -1,62 +1,43 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class NoteScreen extends StatefulWidget {
-  final String title;
-  final String date;
-  final String note;
-  final String note_id;
-
-  const NoteScreen({Key key, this.title, this.date, this.note, this.note_id})
-      : super(key: key);
-
+class NewNote extends StatefulWidget {
   @override
-  _NoteScreenState createState() => _NoteScreenState();
+  _NewNoteState createState() => _NewNoteState();
 }
 
-class _NoteScreenState extends State<NoteScreen> {
+class _NewNoteState extends State<NewNote> {
   String title = '';
   String note = '';
 
-  TextEditingController _titleController;
-  TextEditingController _noteController;
-
   CollectionReference noteRef = FirebaseFirestore.instance.collection('test');
 
-  Future<void> updateNote() {
+  Future<void> addNote() {
     if (title != '' || note != '') {
-      if(title == '') title = widget.title;
-      if(note == '') note = widget.note;
-      return
-        noteRef
-          .doc(widget.note_id)
-            .update({'title': title, 'text': note,})
-            .then((value) => print('ID ADDED TO NOTE'))
-            .catchError((error) => print("Failed to add note: $error"));
+      if (title == '') {
+        if (note.length < 20) {
+          title = note.substring(0, note.length);
+        } else {
+          title = note.substring(0, 40);
+        }
+      }
+      return noteRef
+          .add({'title': title, 'text': note, 'color': '0xff80cbc4'})
+          .then((value) {
+            noteRef
+                .doc(value.id)
+                .update({'note_id': value.id})
+                .then((value) => print('ID ADDED TO NOTE'));
+          })
+          .catchError((error) => print("Failed to add note: $error"));
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _titleController = new TextEditingController(text: widget.title);
-    _noteController = new TextEditingController(text: widget.note);
-  }
-
-  Future<void> deleteNote() {
-    return noteRef
-        .doc(widget.note_id)
-        .delete()
-        .then((value) => print('Note Deleted'))
-        .catchError((error) => print("Failed to delete note: $error"));
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        updateNote();
+        addNote();
         Navigator.of(context).pop();
         return false;
       },
@@ -91,7 +72,7 @@ class _NoteScreenState extends State<NoteScreen> {
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(12),
                                 onTap: () {
-                                  updateNote();
+                                  addNote();
                                   Navigator.pop(context);
                                 },
                                 child: Container(
@@ -102,8 +83,8 @@ class _NoteScreenState extends State<NoteScreen> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Image(
-                                    image: AssetImage(
-                                        'assets/images/icon-back.png'),
+                                    image:
+                                    AssetImage('assets/images/icon-back.png'),
                                     color: Colors.white,
                                     // color: Colors.black,
                                     height: 20,
@@ -132,10 +113,8 @@ class _NoteScreenState extends State<NoteScreen> {
                                 onTap: () {
                                   ScaffoldMessenger.of(context)
                                       .showSnackBar(SnackBar(
-                                    content: Text('Note Deleted'),
+                                    content: Text('Search button clicked'),
                                   ));
-                                  deleteNote();
-                                  Navigator.of(context).pop();
                                 },
                                 child: Container(
                                   height: 36,
@@ -143,14 +122,6 @@ class _NoteScreenState extends State<NoteScreen> {
                                   padding: const EdgeInsets.all(8),
                                   decoration: new BoxDecoration(
                                     borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Image(
-                                    image: AssetImage(
-                                        'assets/images/icon-delete.png'),
-                                    color: Colors.white,
-                                    // color: Colors.black,
-                                    height: 20,
-                                    width: 20,
                                   ),
                                 ),
                               ),
@@ -173,10 +144,9 @@ class _NoteScreenState extends State<NoteScreen> {
                       child: Column(
                         children: <Widget>[
                           Container(
-                              padding: EdgeInsets.only(right: 10),
                               alignment: Alignment.topLeft,
                               child: TextField(
-                                controller: _titleController,
+                                // controller: _titleController,
                                 maxLines: null,
                                 onChanged: (text) {
                                   setState(() {
@@ -195,28 +165,16 @@ class _NoteScreenState extends State<NoteScreen> {
                                 ),
                               )),
                           Container(
-                            margin: EdgeInsets.only(top: 19),
                             alignment: Alignment.topLeft,
-                            child: Text(
-                              // date == null ? 'Loading': 'Edited on ' + date,
-                              widget.date,
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.white.withOpacity(.7),
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ),
-                          Container(
-                            alignment: Alignment.topLeft,
-                            margin: EdgeInsets.only(top: 12),
+                            margin: EdgeInsets.only(top: 9),
                             child: TextField(
-                              controller: _noteController,
+                              // controller: _noteController,
                               maxLines: null,
                               onChanged: (text) {
                                 setState(() {
                                   note = text;
                                 });
-                                print(title);
+                                print(note);
                               },
                               style: TextStyle(
                                 fontSize: 17.0,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:animations/animations.dart';
 import 'package:note_app/screens/note/note.dart';
+import 'package:note_app/screens/newnote/newnote.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -15,10 +16,6 @@ class HomeScreenState extends State<HomeScreen> {
   final db = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
   String name;
-
-  Function _navigateToNote() {
-    ;
-  }
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
     return GestureDetector(
@@ -82,14 +79,19 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        label: Text('New Note'),
-        icon: Icon(Icons.add),
-        backgroundColor: Color(0xff252525),
-        foregroundColor: Colors.white,
-        // tooltip: 'Upload',
-        onPressed: () => {},
-      ),
+      // floatingActionButton: FloatingActionButton.extended(
+      //   label: Text('New Note'),
+      //   icon: Icon(Icons.add),
+      //   backgroundColor: Color(0xff252525),
+      //   foregroundColor: Colors.white,
+      //   // tooltip: 'Upload',
+      //   onPressed: () => {
+      //     Navigator.of(context).push(MaterialPageRoute(builder: (context) => NewNote()))
+      //   },
+      // ),
+
+
+
       backgroundColor: Color(0xff252525),
       // backgroundColor: Colors.white,
       body: Container(
@@ -194,7 +196,11 @@ class HomeScreenState extends State<HomeScreen> {
                                     return NoteScreen(
                                       title: snapshot.data.docs[index]['title'],
                                       date: '7 March 2020',
-                                      note: snapshot.data.docs[index]['text']
+                                      note: snapshot.data.docs[index]['text'],
+                                      note_id: snapshot.data.docs[index]['note_id'],
+                                      // snapshot.data.docs[index]['title'],
+                                      // '7 March 2020',
+                                      // snapshot.data.docs[index]['text'],
                                     );
                                   },
                                   tappable: true,
@@ -208,6 +214,16 @@ class HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        label: Text('New Note'),
+        icon: Icon(Icons.add),
+        backgroundColor: Color(0xff252525),
+        foregroundColor: Colors.white,
+        // tooltip: 'Upload',
+        onPressed: () => {
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => NewNote()))
+        },
       ),
     );
   }
