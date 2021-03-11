@@ -21,17 +21,14 @@ class _NewNoteState extends State<NewNote> {
           title = note.substring(0, 40);
         }
       }
-      return noteRef
-          .add({'title': title, 'text': note, 'color': '0xff80cbc4'})
-          .then((value) {
-            noteRef
-                .doc(value.id)
-                .update({'note_id': value.id})
-                .then((value) => print('ID ADDED TO NOTE'));
-          })
-          .catchError((error) => print("Failed to add note: $error"));
+      return noteRef.add(
+          {'title': title, 'text': note, 'color': '0xff80cbc4'}).then((value) {
+        noteRef.doc(value.id).update({'note_id': value.id}).then(
+            (value) => print('ID ADDED TO NOTE'));
+      }).catchError((error) => print("Failed to add note: $error"));
     }
   }
+  int _value = 42;
 
   @override
   Widget build(BuildContext context) {
@@ -83,8 +80,8 @@ class _NewNoteState extends State<NewNote> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Image(
-                                    image:
-                                    AssetImage('assets/images/icon-back.png'),
+                                    image: AssetImage(
+                                        'assets/images/icon-back.png'),
                                     color: Colors.white,
                                     // color: Colors.black,
                                     height: 20,
@@ -97,38 +94,37 @@ class _NewNoteState extends State<NewNote> {
                           ),
                         )),
                     Positioned(
-                        bottom: 7,
-                        right: 0,
+                      bottom: 7,
+                      right: 0,
 //                    margin: const EdgeInsets.only(bottom: 0),
-                        child: GestureDetector(
-                          child: Container(
-                            decoration: new BoxDecoration(
-                              color: Color(0xff3b3b3b),
+                      child: Container(
+                        decoration: new BoxDecoration(
+                          color: Color(0xff3b3b3b),
 //                            color: Color(0xffe8e8e8),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Material(
-                              child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Material(
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content: Text('Search button clicked'),
+                              ));
+                            },
+                            child: Container(
+                              height: 36,
+                              width: 36,
+                              padding: const EdgeInsets.all(8),
+                              decoration: new BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                onTap: () {
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(SnackBar(
-                                    content: Text('Search button clicked'),
-                                  ));
-                                },
-                                child: Container(
-                                  height: 36,
-                                  width: 36,
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: new BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
                               ),
-                              color: Colors.transparent,
                             ),
                           ),
-                        )),
+                          color: Colors.transparent,
+                        ),
+                      ),
+                    )
                   ],
                 ),
               ),
@@ -143,27 +139,42 @@ class _NewNoteState extends State<NewNote> {
                       ),
                       child: Column(
                         children: <Widget>[
+                          new Positioned(
+                              left: 30.0,
+                              top: 30.0,
+                              child: new Container(
+                                width: 100.0,
+                                height: 80.0,
+                                decoration: new BoxDecoration(color: Colors.red),
+                                child: new Text('hello'),
+                              )
+                          ),
                           Container(
                               alignment: Alignment.topLeft,
-                              child: TextField(
-                                // controller: _titleController,
-                                maxLines: null,
-                                onChanged: (text) {
-                                  setState(() {
-                                    title = text;
-                                  });
-                                  print(title);
-                                },
-                                style: TextStyle(
-                                  fontSize: 35,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                decoration: new InputDecoration.collapsed(
-                                  hintText: 'Title',
-                                  hintStyle: TextStyle(color: Colors.grey),
-                                ),
-                              )),
+                              child: Stack(
+                                children: <Widget>[
+                                  Positioned(child: TextField(
+                                    // controller: _titleController,
+                                    maxLines: null,
+                                    onChanged: (text) {
+                                      setState(() {
+                                        title = text;
+                                      });
+                                      print(title);
+                                    },
+                                    style: TextStyle(
+                                      fontSize: 35,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    decoration: new InputDecoration.collapsed(
+                                      hintText: 'Title',
+                                      hintStyle: TextStyle(color: Colors.grey),
+                                    ),
+                                  )),
+                                ],
+                              )
+                          ),
                           Container(
                             alignment: Alignment.topLeft,
                             margin: EdgeInsets.only(top: 9),
