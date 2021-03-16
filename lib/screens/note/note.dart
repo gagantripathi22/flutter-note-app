@@ -7,8 +7,9 @@ class NoteScreen extends StatefulWidget {
   final String date;
   final String note;
   final String note_id;
+  final String note_color;
 
-  const NoteScreen({Key key, this.title, this.date, this.note, this.note_id})
+  const NoteScreen({Key key, this.title, this.date, this.note, this.note_id, this.note_color})
       : super(key: key);
 
   @override
@@ -18,6 +19,8 @@ class NoteScreen extends StatefulWidget {
 class _NoteScreenState extends State<NoteScreen> {
   String title = '';
   String note = '';
+  bool isColorListShown = false;
+  String selectedNoteColor = '0xffa6a6a6';
 
   TextEditingController _titleController;
   TextEditingController _noteController;
@@ -31,7 +34,7 @@ class _NoteScreenState extends State<NoteScreen> {
       return
         noteRef
           .doc(widget.note_id)
-            .update({'title': title, 'text': note,})
+            .update({'title': title, 'text': note, 'color': selectedNoteColor,})
             .then((value) => print('ID ADDED TO NOTE'))
             .catchError((error) => print("Failed to add note: $error"));
     }
@@ -42,6 +45,9 @@ class _NoteScreenState extends State<NoteScreen> {
     super.initState();
     _titleController = new TextEditingController(text: widget.title);
     _noteController = new TextEditingController(text: widget.note);
+    setState(() {
+      selectedNoteColor = widget.note_color;
+    });
   }
 
   Future<void> deleteNote() {
@@ -52,8 +58,40 @@ class _NoteScreenState extends State<NoteScreen> {
         .catchError((error) => print("Failed to delete note: $error"));
   }
 
+  Widget _colorListItem(color) {
+    return GestureDetector(
+      onTap: () {
+        print(color);
+        setState(() {
+          isColorListShown = false;
+          selectedNoteColor = color;
+        });
+      },
+      child: Container(
+        height: 15,
+        width: 27,
+        margin: EdgeInsets.only(top: 4, bottom: 4, right: 4),
+        decoration: new BoxDecoration(
+          color: Color(int.parse(color)),
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
+  var color_list = [
+    '0xfff48fb1',
+    '0xffffcc80',
+    '0xffe6ee9b',
+    '0xff80deea',
+    '0xffcf93d9',
+    '0xff80cbc4',
+    '0xffa6a6a6'
+  ];
+
   @override
   Widget build(BuildContext context) {
+
     return WillPopScope(
       onWillPop: () async {
         updateNote();
@@ -77,6 +115,81 @@ class _NoteScreenState extends State<NoteScreen> {
                 child: Stack(
 //                crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
+                    if (isColorListShown)
+                      Positioned(
+                          right: 89,
+                          bottom: 7,
+//                    margin: const EdgeInsets.only(bottom: 0),
+                          child: GestureDetector(
+                            child: Container(
+                              decoration: new BoxDecoration(
+                                color: Color(0xff3b3b3b),
+//                            color: Color(0xffe8e8e8),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Container(
+                                height: 36,
+                                width: 194,
+                                padding:
+                                const EdgeInsets.only(left: 7, right: 3),
+                                decoration: new BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: ListView(
+                                  scrollDirection: Axis.horizontal,
+                                  children: color_list.map((String color) {
+                                    return _colorListItem(color);
+                                  }).toList(),
+                                ),
+                              ),
+                            ),
+                          )),
+                    Positioned(
+                        bottom: 7,
+                        right: 45,
+//                    margin: const EdgeInsets.only(bottom: 0),
+                        child: GestureDetector(
+                          child: Container(
+                            decoration: new BoxDecoration(
+                              color: Color(0xff3b3b3b),
+//                            color: Color(0xffe8e8e8),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Material(
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(12),
+                                onTap: () {
+                                  if (isColorListShown)
+                                    setState(() {
+                                      isColorListShown = false;
+                                    });
+                                  else
+                                    setState(() {
+                                      isColorListShown = true;
+                                    });
+                                },
+                                child: Container(
+                                  height: 36,
+                                  width: 36,
+                                  padding: const EdgeInsets.all(5),
+                                  decoration: new BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Container(
+                                    height: 15,
+                                    width: 15,
+                                    decoration: BoxDecoration(
+                                      color: Color(int.parse(selectedNoteColor)),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              color: Colors.transparent,
+                            ),
+                          ),
+                        )
+                    ),
                     Positioned(
                         bottom: 7,
 //                    margin: const EdgeInsets.only(bottom: 0),

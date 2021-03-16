@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:animations/animations.dart';
 import 'package:note_app/screens/note/note.dart';
 import 'package:note_app/screens/newnote/newnote.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -76,6 +78,21 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void testDB() async {
+    // Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    // String path = join(documentsDirectory.path, "ProductDB.db");
+    // var db = await openDatabase('my_data.db',
+    //   version: 1,
+    //   onCreate: (Database db, int version) async {
+    //     await db.execute(
+    //       "Create table test ("
+    //       "id integer primary key,"
+    //       "name text" ")"
+    //     );
+    //   }
+    // );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,6 +137,46 @@ class HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
+                  Positioned(
+                      bottom: 7,
+                      right: 45,
+//                    margin: const EdgeInsets.only(bottom: 0),
+                      child: GestureDetector(
+                        child: Container(
+                          decoration: new BoxDecoration(
+                            color: Color(0xff3b3b3b),
+//                            color: Color(0xffe8e8e8),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Material(
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(12),
+                              onTap: () {
+                                // updateNote();
+                                // Navigator.pop(context);
+                                testDB();
+                              },
+                              child: Container(
+                                height: 36,
+                                width: 36,
+                                padding: const EdgeInsets.all(8),
+                                decoration: new BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Image(
+                                  image: AssetImage(
+                                      'assets/images/icon-back.png'),
+                                  color: Colors.white,
+                                  // color: Colors.black,
+                                  height: 20,
+                                  width: 20,
+                                ),
+                              ),
+                            ),
+                            color: Colors.transparent,
+                          ),
+                        ),
+                      )),
                   Positioned(
                       bottom: 7,
                       right: 0,
@@ -198,6 +255,7 @@ class HomeScreenState extends State<HomeScreen> {
                                       date: '7 March 2020',
                                       note: snapshot.data.docs[index]['text'],
                                       note_id: snapshot.data.docs[index]['note_id'],
+                                      note_color: snapshot.data.docs[index]['color'],
                                       // snapshot.data.docs[index]['title'],
                                       // '7 March 2020',
                                       // snapshot.data.docs[index]['text'],
@@ -218,7 +276,7 @@ class HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton.extended(
         label: Text('New Note'),
         icon: Icon(Icons.add),
-        backgroundColor: Color(0xff252525),
+        backgroundColor: Color(0xff3b3b3b),
         foregroundColor: Colors.white,
         // tooltip: 'Upload',
         onPressed: () => {

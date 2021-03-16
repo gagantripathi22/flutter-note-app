@@ -9,6 +9,8 @@ class NewNote extends StatefulWidget {
 class _NewNoteState extends State<NewNote> {
   String title = '';
   String note = '';
+  bool isColorListShown = false;
+  String selectedNoteColor = '0xffa6a6a6';
 
   CollectionReference noteRef = FirebaseFirestore.instance.collection('test');
 
@@ -22,13 +24,53 @@ class _NewNoteState extends State<NewNote> {
         }
       }
       return noteRef.add(
-          {'title': title, 'text': note, 'color': '0xff80cbc4'}).then((value) {
+          {'title': title, 'text': note, 'color': selectedNoteColor}).then((value) {
         noteRef.doc(value.id).update({'note_id': value.id}).then(
-            (value) => print('ID ADDED TO NOTE'));
+                (value) => print('ID ADDED TO NOTE'));
       }).catchError((error) => print("Failed to add note: $error"));
     }
   }
-  int _value = 42;
+
+  Widget ColorList = new Container(
+    height: 15,
+    width: 27,
+    margin: EdgeInsets.only(top: 4, bottom: 4),
+    decoration: new BoxDecoration(
+      color: Color(0xfff48fb1),
+      borderRadius: BorderRadius.circular(12),
+    ),
+  );
+
+  Widget _colorListItem(color) {
+    return GestureDetector(
+      onTap: () {
+        print(color);
+        setState(() {
+          isColorListShown = false;
+          selectedNoteColor = color;
+        });
+      },
+      child: Container(
+        height: 15,
+        width: 27,
+        margin: EdgeInsets.only(top: 4, bottom: 4, right: 4),
+        decoration: new BoxDecoration(
+          color: Color(int.parse(color)),
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
+  var color_list = [
+    '0xfff48fb1',
+    '0xffffcc80',
+    '0xffe6ee9b',
+    '0xff80deea',
+    '0xffcf93d9',
+    '0xff80cbc4',
+    '0xffa6a6a6'
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +78,10 @@ class _NewNoteState extends State<NewNote> {
       onWillPop: () async {
         addNote();
         Navigator.of(context).pop();
+//        ScaffoldMessenger.of(context)
+//            .showSnackBar(SnackBar(
+//          content: Text('Note Saved'),
+//        ));
         return false;
       },
       child: Scaffold(
@@ -93,38 +139,81 @@ class _NewNoteState extends State<NewNote> {
                             ),
                           ),
                         )),
-                    Positioned(
-                      bottom: 7,
-                      right: 0,
+                    if (isColorListShown)
+                      Positioned(
+                          right: 43,
+                          bottom: 7,
 //                    margin: const EdgeInsets.only(bottom: 0),
-                      child: Container(
-                        decoration: new BoxDecoration(
-                          color: Color(0xff3b3b3b),
-//                            color: Color(0xffe8e8e8),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Material(
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(12),
-                            onTap: () {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content: Text('Search button clicked'),
-                              ));
-                            },
+                          child: GestureDetector(
                             child: Container(
-                              height: 36,
-                              width: 36,
-                              padding: const EdgeInsets.all(8),
                               decoration: new BoxDecoration(
+                                color: Color(0xff3b3b3b),
+//                            color: Color(0xffe8e8e8),
                                 borderRadius: BorderRadius.circular(12),
                               ),
+                              child: Container(
+                                height: 36,
+                                width: 194,
+                                padding:
+                                const EdgeInsets.only(left: 7, right: 3),
+                                decoration: new BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: ListView(
+                                  scrollDirection: Axis.horizontal,
+                                  children: color_list.map((String color) {
+                                    return _colorListItem(color);
+                                  }).toList(),
+                                ),
+                              ),
+                            ),
+                          )),
+                    Positioned(
+                        bottom: 7,
+                        right: 0,
+//                    margin: const EdgeInsets.only(bottom: 0),
+                        child: GestureDetector(
+                          child: Container(
+                            decoration: new BoxDecoration(
+                              color: Color(0xff3b3b3b),
+//                            color: Color(0xffe8e8e8),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Material(
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(12),
+                                onTap: () {
+                                  if (isColorListShown)
+                                    setState(() {
+                                      isColorListShown = false;
+                                    });
+                                  else
+                                    setState(() {
+                                      isColorListShown = true;
+                                    });
+                                },
+                                child: Container(
+                                  height: 36,
+                                  width: 36,
+                                  padding: const EdgeInsets.all(5),
+                                  decoration: new BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Container(
+                                    height: 15,
+                                    width: 15,
+                                    decoration: BoxDecoration(
+                                      color: Color(int.parse(selectedNoteColor)),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              color: Colors.transparent,
                             ),
                           ),
-                          color: Colors.transparent,
-                        ),
-                      ),
-                    )
+                        )
+                    ),
                   ],
                 ),
               ),
@@ -139,42 +228,27 @@ class _NewNoteState extends State<NewNote> {
                       ),
                       child: Column(
                         children: <Widget>[
-                          new Positioned(
-                              left: 30.0,
-                              top: 30.0,
-                              child: new Container(
-                                width: 100.0,
-                                height: 80.0,
-                                decoration: new BoxDecoration(color: Colors.red),
-                                child: new Text('hello'),
-                              )
-                          ),
                           Container(
                               alignment: Alignment.topLeft,
-                              child: Stack(
-                                children: <Widget>[
-                                  Positioned(child: TextField(
-                                    // controller: _titleController,
-                                    maxLines: null,
-                                    onChanged: (text) {
-                                      setState(() {
-                                        title = text;
-                                      });
-                                      print(title);
-                                    },
-                                    style: TextStyle(
-                                      fontSize: 35,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    decoration: new InputDecoration.collapsed(
-                                      hintText: 'Title',
-                                      hintStyle: TextStyle(color: Colors.grey),
-                                    ),
-                                  )),
-                                ],
-                              )
-                          ),
+                              child: TextField(
+                                // controller: _titleController,
+                                maxLines: null,
+                                onChanged: (text) {
+                                  setState(() {
+                                    title = text;
+                                  });
+                                  print(title);
+                                },
+                                style: TextStyle(
+                                  fontSize: 35,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                decoration: new InputDecoration.collapsed(
+                                  hintText: 'Title',
+                                  hintStyle: TextStyle(color: Colors.grey),
+                                ),
+                              )),
                           Container(
                             alignment: Alignment.topLeft,
                             margin: EdgeInsets.only(top: 9),
