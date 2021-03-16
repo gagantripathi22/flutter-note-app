@@ -1,11 +1,68 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:note_app/models/test_model.dart';
 import 'package:note_app/screens/home/home.dart';
+import 'package:note_app/models/customer_model.dart';
+import 'package:note_app/models/database_helper.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  void initializeDatabase() async {
+    final memo = Customer(
+      id: 1,
+      title: 'Title 1',
+      note: 'Note 1',
+      color: '0xffffffff',
+    );
+
+    MemoDbProvider memoDb = MemoDbProvider();
+    await memoDb.addItem(memo);
+  }
+
+  void insertIntoDatabase() async {
+    MemoDbProvider memoDb = MemoDbProvider();
+    var memos = await memoDb.fetchMemos();
+    print(memos[0].note); //Title 1
+  }
+
+  GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+
+  bool isLoggedIn = false;
+
+  _logIn() async {
+    try {
+      await _googleSignIn.signIn();
+      setState(() {
+        isLoggedIn = true;
+      });
+    }
+    catch(err) {
+      print(err);
+    }
+  }
+
+  _logOut() async {
+    try {
+      await _googleSignIn.signOut();
+    }
+    catch(err) {
+      print(err);
+    }
+//    setState(() {
+//      isLoggedIn = false;
+//    });
+    print(isLoggedIn);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-//      backgroundColor: Colors.white,
       backgroundColor: Color(0xff252525),
       body: Container(
         child: Column(
@@ -66,16 +123,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ],
               ),
-
-
-
-
-
-
-
-
             ),
-
             Container(
               alignment: Alignment.center,
               margin: const EdgeInsets.only(top: 30),
@@ -84,10 +132,8 @@ class LoginScreen extends StatelessWidget {
               child: GestureDetector(
                 child: InkWell(
                   onTap: () {
-//                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-//                      content: Text('Welcome to Paper Note'),
-//                    ));
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen()));
+//                    initializeDatabase();
+                    _logIn();
                   },
                   borderRadius: BorderRadius.circular(10),
                   child: Container(
@@ -124,10 +170,54 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
             ),
-
+            GestureDetector(
+              child: InkWell(
+                onTap: () {
+//                  insertIntoDatabase();
+                  _logOut();
+                },
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  height: 50,
+                  padding: const EdgeInsets.only(left: 15, right: 15),
+                  decoration: new BoxDecoration(
+//                  color: Color(0xffe8e8e8),
+                    border: Border.all(color: Color(0xff4f4f4f)),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Image(
+                        image: AssetImage('assets/images/google-logo.png'),
+                        height: 26,
+                        width: 26,
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(left: 10),
+                        child: Text(
+                          "Sign up with Google",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
+
+//
+//class LoginScreen extends StatelessWidget {
+//
+//}
