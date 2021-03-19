@@ -134,11 +134,16 @@ class _NoteScreenState extends State<NoteScreen> {
     return WillPopScope(
 
       onWillPop: () async {
-        updateNote();
-        Navigator.of(context).pop();
-        // Navigator.pop(context, {
-        //   'id': widget.note_id,
-        // });
+        // updateNote();
+        // Navigator.of(context).pop();
+        Navigator.pop(context, {
+          'id': widget.note_id,
+          'title': title,
+          'note': note,
+          'color': selectedNoteColor,
+          'isDelete': false,
+          'noteIndex': widget.id_in_list,
+        });
         // setState(() {
         //   nl.note_list.insert(0,{
         //     "id": 100,
@@ -307,8 +312,15 @@ class _NoteScreenState extends State<NoteScreen> {
                                       .showSnackBar(SnackBar(
                                     content: Text('Note Deleted'),
                                   ));
-                                  deleteNote();
-                                  Navigator.of(context).pop();
+                                  // deleteNote();
+                                  Navigator.pop(context, {
+                                    'id': widget.note_id,
+                                    'title': title,
+                                    'note': note,
+                                    'color': selectedNoteColor,
+                                    'isDelete': true,
+                                    'noteIndex': widget.id_in_list,
+                                  });
                                 },
                                 child: Container(
                                   height: 36,

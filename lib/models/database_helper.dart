@@ -87,7 +87,7 @@ class MemoDbProvider {
 //
 //     return result.toList();
     final db = await init();
-    var result = await db.rawQuery('SELECT * FROM Memos');
+    var result = await db.rawQuery('SELECT * FROM Memos ORDER BY id DESC');
     return result.toList();
   }
 }

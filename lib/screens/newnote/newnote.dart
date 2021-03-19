@@ -103,11 +103,11 @@ class _NewNoteState extends State<NewNote> {
     return WillPopScope(
       onWillPop: () async {
         addNote();
-        Navigator.of(context).pop();
-//        ScaffoldMessenger.of(context)
-//            .showSnackBar(SnackBar(
-//          content: Text('Note Saved'),
-//        ));
+        Navigator.pop(context, {
+          'title': title,
+          'note': note,
+          'color': selectedNoteColor,
+        });
         return false;
       },
       child: Scaffold(
