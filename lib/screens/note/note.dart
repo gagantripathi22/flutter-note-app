@@ -1,15 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:note_app/models/database_helper.dart';
+import 'package:note_app/models/customer_model.dart';
+import 'package:note_app/services/note_list.dart';
+import 'package:note_app/screens/home/home.dart';
 
 class NoteScreen extends StatefulWidget {
   final String title;
   final String date;
   final String note;
-  final String note_id;
+  final int note_id;
   final String note_color;
+  final int id_in_list;
 
-  const NoteScreen({Key key, this.title, this.date, this.note, this.note_id, this.note_color})
+  const NoteScreen({Key key, this.title, this.date, this.note, this.note_id, this.note_color, this.id_in_list})
       : super(key: key);
 
   @override
@@ -27,16 +32,41 @@ class _NoteScreenState extends State<NoteScreen> {
 
   CollectionReference noteRef = FirebaseFirestore.instance.collection('test');
 
-  Future<void> updateNote() {
+  // Future<void> updateNote() {
+  //   if (title != '' || note != '') {
+  //     if(title == '') title = widget.title;
+  //     if(note == '') note = widget.note;
+  //     return
+  //       noteRef
+  //         .doc(widget.note_id.toString())
+  //           .update({'title': title, 'text': note, 'color': selectedNoteColor,})
+  //           .then((value) => print('ID ADDED TO NOTE'))
+  //           .catchError((error) => print("Failed to add note: $error"));
+  //   }
+  // }
+
+  void updateNote() async {
+    print('borking');
+    // setState(() {
+    //   nl.note_list.insert(0,{
+    //     "id": 100,
+    //     "title": 'ehy',
+    //     "note": "HOEHOE",
+    //     "color": "0xffffffff",
+    //   });
+    // });
+
+    MemoDbProvider memoDb = MemoDbProvider();
     if (title != '' || note != '') {
       if(title == '') title = widget.title;
       if(note == '') note = widget.note;
-      return
-        noteRef
-          .doc(widget.note_id)
-            .update({'title': title, 'text': note, 'color': selectedNoteColor,})
-            .then((value) => print('ID ADDED TO NOTE'))
-            .catchError((error) => print("Failed to add note: $error"));
+      final memo = Customer(
+        id: widget.note_id,
+        title: title,
+        note: note,
+        color: selectedNoteColor,
+      );
+      memoDb.updateMemo(widget.note_id, memo);
     }
   }
 
@@ -50,12 +80,19 @@ class _NoteScreenState extends State<NoteScreen> {
     });
   }
 
-  Future<void> deleteNote() {
-    return noteRef
-        .doc(widget.note_id)
-        .delete()
-        .then((value) => print('Note Deleted'))
-        .catchError((error) => print("Failed to delete note: $error"));
+  Future<void> deleteNote() async {
+    // return noteRef
+    //     .doc(widget.note_id.toString())
+    //     .delete()
+    //     .then((value) => print('Note Deleted'))
+    //     .catchError((error) => print("Failed to delete note: $error"));
+    MemoDbProvider memoDb = MemoDbProvider();
+    // memoDb.deleteMemo(widget.note_id);
+    // setState(() {
+    //   note_list.removeAt(widget.id_in_list);
+    // });
+    HomeScreenState HSS = HomeScreenState();
+    HSS.removeList();
   }
 
   Widget _colorListItem(color) {
@@ -89,13 +126,27 @@ class _NoteScreenState extends State<NoteScreen> {
     '0xffa6a6a6'
   ];
 
+  // NoteList nl = NoteList();
+
   @override
   Widget build(BuildContext context) {
 
     return WillPopScope(
+
       onWillPop: () async {
         updateNote();
         Navigator.of(context).pop();
+        // Navigator.pop(context, {
+        //   'id': widget.note_id,
+        // });
+        // setState(() {
+        //   nl.note_list.insert(0,{
+        //     "id": 100,
+        //     "title": 'ehy',
+        //     "note": "HOEHOE",
+        //     "color": "0xffffffff",
+        //   });
+        // });
         return false;
       },
       child: Scaffold(
@@ -204,7 +255,16 @@ class _NoteScreenState extends State<NoteScreen> {
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(12),
                                 onTap: () {
-                                  updateNote();
+                                  print('AALU');
+                                  // updateNote();
+                                  // setState(() {
+                                  //   nl.note_list.insert(0,{
+                                  //     "id": 100,
+                                  //     "title": 'ehy',
+                                  //     "note": "HOEHOE",
+                                  //     "color": "0xffffffff",
+                                  //   });
+                                  // });
                                   Navigator.pop(context);
                                 },
                                 child: Container(
@@ -312,7 +372,7 @@ class _NoteScreenState extends State<NoteScreen> {
                             alignment: Alignment.topLeft,
                             child: Text(
                               // date == null ? 'Loading': 'Edited on ' + date,
-                              widget.date,
+                              widget.note_id.toString(),
                               style: TextStyle(
                                   fontSize: 15,
                                   color: Colors.white.withOpacity(.7),

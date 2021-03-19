@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:note_app/models/database_helper.dart';
+import 'package:note_app/models/customer_model.dart';
 
 class NewNote extends StatefulWidget {
   @override
@@ -13,8 +16,26 @@ class _NewNoteState extends State<NewNote> {
   String selectedNoteColor = '0xffa6a6a6';
 
   CollectionReference noteRef = FirebaseFirestore.instance.collection('test');
+  final FirebaseAuth auth = FirebaseAuth.instance;
 
-  Future<void> addNote() {
+  // Future<void> addNote() {
+  //   if (title != '' || note != '') {
+  //     if (title == '') {
+  //       if (note.length < 20) {
+  //         title = note.substring(0, note.length);
+  //       } else {
+  //         title = note.substring(0, 40);
+  //       }
+  //     }
+  //     return noteRef.add(
+  //         {'title': title, 'text': note, 'color': selectedNoteColor}).then((value) {
+  //       noteRef.doc(value.id).update({'note_id': value.id}).then(
+  //               (value) => print('ID ADDED TO NOTE'));
+  //     }).catchError((error) => print("Failed to add note: $error"));
+  //   }
+  // }
+
+  addNote() async {
     if (title != '' || note != '') {
       if (title == '') {
         if (note.length < 20) {
@@ -23,11 +44,16 @@ class _NewNoteState extends State<NewNote> {
           title = note.substring(0, 40);
         }
       }
-      return noteRef.add(
-          {'title': title, 'text': note, 'color': selectedNoteColor}).then((value) {
-        noteRef.doc(value.id).update({'note_id': value.id}).then(
-                (value) => print('ID ADDED TO NOTE'));
-      }).catchError((error) => print("Failed to add note: $error"));
+      final memo = Customer(
+        // id: 2,
+        title: title,
+        note: note,
+        color: selectedNoteColor,
+      );
+      MemoDbProvider memoDb = MemoDbProvider();
+      await memoDb.addItem(memo);
+      var memos = await memoDb.fetchMemos();
+      // print(memos[0].note);
     }
   }
 

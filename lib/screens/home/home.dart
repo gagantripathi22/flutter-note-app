@@ -5,6 +5,9 @@ import 'package:note_app/screens/note/note.dart';
 import 'package:note_app/screens/newnote/newnote.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:note_app/models/database_helper.dart';
+import 'package:note_app/models/customer_model.dart';
+import 'package:note_app/services/note_list.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -19,10 +22,9 @@ class HomeScreenState extends State<HomeScreen> {
   final _formKey = GlobalKey<FormState>();
   String name;
 
-  Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
+  Widget _buildListItem(context, document) {
     return GestureDetector(
       child: Container(
-
         child: Material(
           color: Colors.transparent,
           child: InkWell(
@@ -36,11 +38,12 @@ class HomeScreenState extends State<HomeScreen> {
               ),
               constraints: BoxConstraints(
 //                maxHeight: 100, minHeight: 80,
-              ),
+                  ),
               decoration: new BoxDecoration(
-                 color: Color(int.parse(document['color'])).withOpacity(.03),
+                color: Color(int.parse(document['color'])).withOpacity(.03),
 //                border: Border.all(color: Color(0xff525252.2),
-                border: Border.all(color: Color(int.parse(document['color'])).withOpacity(.7)),
+                border: Border.all(
+                    color: Color(int.parse(document['color'])).withOpacity(.7)),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Column(
@@ -58,15 +61,16 @@ class HomeScreenState extends State<HomeScreen> {
                   ),
                   Container(
                     alignment: Alignment.centerRight,
-                    margin: EdgeInsets.only(top: 5,),
+                    margin: EdgeInsets.only(
+                      top: 5,
+                    ),
                     child: Text(
                       'March 7, 2020',
                       style: TextStyle(
-                        // color: Color(0xff1b1c17).withOpacity(.5),
-                        color: Color(0xffffffff).withOpacity(.5),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w300
-                      ),
+                          // color: Color(0xff1b1c17).withOpacity(.5),
+                          color: Color(0xffffffff).withOpacity(.5),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w300),
                     ),
                   ),
                 ],
@@ -78,37 +82,100 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  List items;
+
+  @override
+  void initState()  {
+    // TODO: implement initState
+    testDB();
+  }
+
+  // NoteList nl = NoteList();
+
   void testDB() async {
-    // Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    // String path = join(documentsDirectory.path, "ProductDB.db");
-    // var db = await openDatabase('my_data.db',
-    //   version: 1,
-    //   onCreate: (Database db, int version) async {
-    //     await db.execute(
-    //       "Create table test ("
-    //       "id integer primary key,"
-    //       "name text" ")"
-    //     );
-    //   }
-    // );
+    MemoDbProvider memoDb = MemoDbProvider();
+    List memos = await memoDb.getAllNotes();
+    // print(memos[0]['title']);
+
+    note_list = memos;
+    print(note_list);
+  }
+
+  void removeList() async {
+    MemoDbProvider memoDb = MemoDbProvider();
+
+    memoDb.deleteMemo(13);
+
+
+    // setState(() {
+    //   note_list.removeAt(1);
+    // });
+    // print('is removed');
+
+    // setState(() {
+    //   nl.note_list.insert(0,{
+    //     "id": 100,
+    //     "title": 'ehy',
+    //     "note": "HOEHOE",
+    //     "color": "0xffffffff",
+    //   });
+    // });
+
+
+    // items[items.indexWhere((element) => element.id == 5)] = {
+    //       "id": 100,
+    //       "title": 'huhuihhuihuiuihuih',
+    //       "note": "HOEHOE",
+    //       "color": "0xffffffff",
+    //     };
+
+    // setState(() {
+    //   nl.note_list[3] = {
+    //     "id": 100,
+    //     "title": 'newew nigaa',
+    //     "note": "HOEHOE",
+    //     "color": "0xffffffff",
+    //   };
+    // });
+
+
+    // items[2].title = 'Pending';
+
+
   }
 
   @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    MemoDbProvider memoDb = MemoDbProvider();
+    List memos = await memoDb.getAllNotes();
+    // print(memos[0]['title']);
+    note_list = memos;
+    print(note_list);
+  }
+
+  String text;
+
+  void _awaitReturnValueFromSecondScreen(BuildContext context) async {
+
+    // start the SecondScreen and wait for it to finish with a result
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NoteScreen(),
+        ));
+
+    // after the SecondScreen result comes back update the Text widget with it
+    setState(() {
+      text = result;
+    });
+  }
+
+
+  @override
   Widget build(BuildContext context) {
+    MemoDbProvider memoDb = MemoDbProvider();
     return Scaffold(
-      // floatingActionButton: FloatingActionButton.extended(
-      //   label: Text('New Note'),
-      //   icon: Icon(Icons.add),
-      //   backgroundColor: Color(0xff252525),
-      //   foregroundColor: Colors.white,
-      //   // tooltip: 'Upload',
-      //   onPressed: () => {
-      //     Navigator.of(context).push(MaterialPageRoute(builder: (context) => NewNote()))
-      //   },
-      // ),
-
-
-
       backgroundColor: Color(0xff252525),
       // backgroundColor: Colors.white,
       body: Container(
@@ -154,7 +221,8 @@ class HomeScreenState extends State<HomeScreen> {
                               onTap: () {
                                 // updateNote();
                                 // Navigator.pop(context);
-                                testDB();
+                                // testDB();
+                                removeList();
                               },
                               child: Container(
                                 height: 36,
@@ -164,8 +232,8 @@ class HomeScreenState extends State<HomeScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Image(
-                                  image: AssetImage(
-                                      'assets/images/icon-back.png'),
+                                  image:
+                                      AssetImage('assets/images/icon-sync.png'),
                                   color: Colors.white,
                                   // color: Colors.black,
                                   height: 20,
@@ -184,7 +252,7 @@ class HomeScreenState extends State<HomeScreen> {
                       child: GestureDetector(
                         child: Container(
                           decoration: new BoxDecoration(
-                           color: Color(0xff3b3b3b),
+                            color: Color(0xff3b3b3b),
 //                            color: Color(0xffe8e8e8),
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -207,7 +275,7 @@ class HomeScreenState extends State<HomeScreen> {
                                 child: Image(
                                   image: AssetImage(
                                       'assets/images/icon-search.png'),
-                                 color: Colors.white,
+                                  color: Colors.white,
                                   // color: Colors.black,
                                   height: 20,
                                   width: 20,
@@ -223,52 +291,48 @@ class HomeScreenState extends State<HomeScreen> {
             ),
             Expanded(
               child: Container(
-                child: ScrollConfiguration(
-                  behavior: ScrollBehavior(),
-                  child: GlowingOverscrollIndicator(
-                    axisDirection: AxisDirection.down,
-                    color: Colors.grey,
-                    child: StreamBuilder(
-                        stream: FirebaseFirestore.instance.collection('test').snapshots(),
-                        builder: (context, snapshot) {
-                          if(!snapshot.hasData) return const Text('Loading...');
-                          return ListView.builder(
-                            padding: EdgeInsets.only(top: 5, bottom: 5),
-//                      itemExtent: 80.0,
-                            itemCount: snapshot.data.docs.length,
-                            itemBuilder: (context, index) =>
-                                OpenContainer(
-//                                  closedBuilder: (context, action) (
-//                                    _buildListItem(context, snapshot.data.docs[index]),
-//                                  ),
-                                  closedColor: Color(0xff252525),
-                                  closedElevation: 0,
-//                                  transitionDuration: Duration(milliseconds: 2000),
+                  child: ScrollConfiguration(
+                behavior: ScrollBehavior(),
+                child: GlowingOverscrollIndicator(
+                  axisDirection: AxisDirection.down,
+                  color: Colors.grey,
+                  child: FutureBuilder(
+                    future: memoDb.getAllNotes(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return Center(child: CircularProgressIndicator());
+                      }
 
-                                  openColor: Color(0xff252525),
-                                  closedBuilder: (context, action) {
-                                    return _buildListItem(context, snapshot.data.docs[index]);
-                                  },
-                                  openBuilder: (context, action) {
-                                    return NoteScreen(
-                                      title: snapshot.data.docs[index]['title'],
-                                      date: '7 March 2020',
-                                      note: snapshot.data.docs[index]['text'],
-                                      note_id: snapshot.data.docs[index]['note_id'],
-                                      note_color: snapshot.data.docs[index]['color'],
-                                      // snapshot.data.docs[index]['title'],
-                                      // '7 March 2020',
-                                      // snapshot.data.docs[index]['text'],
-                                    );
-                                  },
-                                  tappable: true,
-                                )
-                          );
-                        }
-                    ),
-                  ),
-                )
-              ),
+                      return ListView.builder(
+                          padding: EdgeInsets.only(top: 5, bottom: 5),
+//                      itemExtent: 80.0,
+                          itemCount: snapshot.data.length,
+                          itemBuilder: (context, index) => OpenContainer(
+                            closedColor: Color(0xff252525),
+                            closedElevation: 0,
+//                                  transitionDuration: Duration(milliseconds: 2000),
+                            openColor: Color(0xff252525),
+                            closedBuilder: (context, action) {
+                              return _buildListItem(context, note_list[index]);
+                            },
+                            openBuilder: (context, action) {
+                              return NoteScreen(
+                                title: snapshot.data[index]['title'],
+                                date: '7 March 2020',
+                                note: snapshot.data[index]['note'],
+                                note_id: snapshot.data[index]['id'],
+                                note_color: snapshot.data[index]['color'],
+                                id_in_list: index,
+                              );
+                              // return _awaitReturnValueFromSecondScreen();
+                            },
+                            tappable: true,
+                          )
+                      );
+                    },
+                  )
+                ),
+              )),
             ),
           ],
         ),
@@ -280,7 +344,11 @@ class HomeScreenState extends State<HomeScreen> {
         foregroundColor: Colors.white,
         // tooltip: 'Upload',
         onPressed: () => {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => NewNote()))
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => NewNote()))
+              .then((value) {
+            // testDB();
+          })
         },
       ),
     );
