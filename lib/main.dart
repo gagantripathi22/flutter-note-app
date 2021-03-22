@@ -13,15 +13,18 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 //  MemoDbProvider memoDb = MemoDbProvider();
   final prefs = await SharedPreferences.getInstance();
+  if(prefs.getBool('isLoggedIn') == null)
+    prefs.setBool('isLoggedIn', false);
+  // prefs.setBool('isLoggedIn', false);
   await Firebase.initializeApp();
-  if(prefs.getBool('isLoggedIn')) {
+  if(prefs.getBool('isLoggedIn') == true) {
     // runApp(MyApp());
     runApp(YourApp());
   } else {
     // runApp(YourApp());
     runApp(MyApp());
   }
-
+  // runApp(YourApp());
 }
 
 class MyApp extends StatelessWidget {

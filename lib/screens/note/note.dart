@@ -25,84 +25,32 @@ class _NoteScreenState extends State<NoteScreen> {
   String title = '';
   String note = '';
   bool isColorListShown = false;
-  String selectedNoteColor = '0xffa6a6a6';
+  String selectedNoteColor = '0xffffffff';
 
   TextEditingController _titleController;
   TextEditingController _noteController;
 
   CollectionReference noteRef = FirebaseFirestore.instance.collection('test');
 
-  // Future<void> updateNote() {
-  //   if (title != '' || note != '') {
-  //     if(title == '') title = widget.title;
-  //     if(note == '') note = widget.note;
-  //     return
-  //       noteRef
-  //         .doc(widget.note_id.toString())
-  //           .update({'title': title, 'text': note, 'color': selectedNoteColor,})
-  //           .then((value) => print('ID ADDED TO NOTE'))
-  //           .catchError((error) => print("Failed to add note: $error"));
-  //   }
-  // }
-
-  void updateNote() async {
-    print('borking');
-    // setState(() {
-    //   nl.note_list.insert(0,{
-    //     "id": 100,
-    //     "title": 'ehy',
-    //     "note": "HOEHOE",
-    //     "color": "0xffffffff",
-    //   });
-    // });
-
-    MemoDbProvider memoDb = MemoDbProvider();
-    if (title != '' || note != '') {
-      if(title == '') title = widget.title;
-      if(note == '') note = widget.note;
-      final memo = Customer(
-        id: widget.note_id,
-        title: title,
-        note: note,
-        color: selectedNoteColor,
-      );
-      memoDb.updateMemo(widget.note_id, memo);
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     _titleController = new TextEditingController(text: widget.title);
     _noteController = new TextEditingController(text: widget.note);
-    setState(() {
-      selectedNoteColor = widget.note_color;
-    });
-  }
-
-  Future<void> deleteNote() async {
-    // return noteRef
-    //     .doc(widget.note_id.toString())
-    //     .delete()
-    //     .then((value) => print('Note Deleted'))
-    //     .catchError((error) => print("Failed to delete note: $error"));
-    MemoDbProvider memoDb = MemoDbProvider();
-    // memoDb.deleteMemo(widget.note_id);
     // setState(() {
-    //   note_list.removeAt(widget.id_in_list);
+      // selectedNoteColor = widget.note_color;
     // });
-    HomeScreenState HSS = HomeScreenState();
-    HSS.removeList();
   }
 
   Widget _colorListItem(color) {
     return GestureDetector(
       onTap: () {
-        print(color);
+        print("COLORR " + color);
         setState(() {
           isColorListShown = false;
           selectedNoteColor = color;
         });
+        print(selectedNoteColor);
       },
       child: Container(
         height: 15,
@@ -134,8 +82,6 @@ class _NoteScreenState extends State<NoteScreen> {
     return WillPopScope(
 
       onWillPop: () async {
-        // updateNote();
-        // Navigator.of(context).pop();
         Navigator.pop(context, {
           'id': widget.note_id,
           'title': title,
@@ -144,19 +90,10 @@ class _NoteScreenState extends State<NoteScreen> {
           'isDelete': false,
           'noteIndex': widget.id_in_list,
         });
-        // setState(() {
-        //   nl.note_list.insert(0,{
-        //     "id": 100,
-        //     "title": 'ehy',
-        //     "note": "HOEHOE",
-        //     "color": "0xffffffff",
-        //   });
-        // });
         return false;
       },
       child: Scaffold(
         backgroundColor: Color(0xff252525),
-        // backgroundColor: Colors.white,
         body: Container(
           child: Column(
             children: <Widget>[
@@ -260,17 +197,14 @@ class _NoteScreenState extends State<NoteScreen> {
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(12),
                                 onTap: () {
-                                  print('AALU');
-                                  // updateNote();
-                                  // setState(() {
-                                  //   nl.note_list.insert(0,{
-                                  //     "id": 100,
-                                  //     "title": 'ehy',
-                                  //     "note": "HOEHOE",
-                                  //     "color": "0xffffffff",
-                                  //   });
-                                  // });
-                                  Navigator.pop(context);
+                                  Navigator.pop(context, {
+                                  'id': widget.note_id,
+                                  'title': title,
+                                  'note': note,
+                                  'color': selectedNoteColor,
+                                  'isDelete': false,
+                                  'noteIndex': widget.id_in_list,
+                                });
                                 },
                                 child: Container(
                                   height: 36,

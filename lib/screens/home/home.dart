@@ -8,6 +8,7 @@ import 'package:path/path.dart';
 import 'package:note_app/models/database_helper.dart';
 import 'package:note_app/models/customer_model.dart';
 import 'package:note_app/services/note_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -36,7 +37,8 @@ class HomeScreenState extends State<HomeScreen> {
       );
       MemoDbProvider memoDb = MemoDbProvider();
       memoDb.updateMemo(document['id'], memo);
-
+      print('Returned Note Color : ' + information['color']);
+      print('Returned Note Title : ' + information['title']);
       setState(() {
         note_list[index] = {
           "id": document['id'],
@@ -184,11 +186,16 @@ class HomeScreenState extends State<HomeScreen> {
     testDB();
   }
 
+  bool isNotesLoaded = false;
+
   // NoteList nl = NoteList();
 
-  void testDB() async {
+  Future<void> testDB() async {
     MemoDbProvider memoDb = MemoDbProvider();
     List memos = await memoDb.getAllNotes();
+    setState(() {
+      isNotesLoaded = true;
+    });
     // print(memos[0]['title']);
 
     note_list = memos;
@@ -196,7 +203,10 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   void removeList() async {
-    print(_returnedData);
+    // print(_returnedData);
+
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isLoggedIn', false);
 
     // MemoDbProvider memoDb = MemoDbProvider();
     //
@@ -274,6 +284,7 @@ class HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Color(0xff252525),
       // backgroundColor: Colors.white,
+      
       body: Container(
         child: Column(
           children: <Widget>[
@@ -393,11 +404,11 @@ class HomeScreenState extends State<HomeScreen> {
                   axisDirection: AxisDirection.down,
                   color: Colors.grey,
                   child: ListView.builder(
-                      padding: EdgeInsets.only(top: 5, bottom: 5),
-//                      itemExtent: 80.0,
-                      itemCount: note_list.length,
-                      itemBuilder: (context, index) => _buildListItem(context, note_list[index], index)
-                  )
+                          padding: EdgeInsets.only(top: 5, bottom: 5),
+    //                      itemExtent: 80.0,
+                          itemCount: note_list.length,
+                          itemBuilder: (context, index) => _buildListItem(context, note_list[index], index)
+                        )
                 ),
               )),
             ),
@@ -414,6 +425,7 @@ class HomeScreenState extends State<HomeScreen> {
           _navigateToNewNoteScreen(context)
         },
       ),
+      drawer: Drawer(child: Text('test'),),
     );
   }
 }

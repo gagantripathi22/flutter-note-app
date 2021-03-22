@@ -10,12 +10,16 @@ import 'package:note_app/services/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../home/home.dart';
+
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  bool isSignInSucess;
+
   void initializeDatabase() async {
     final memo = Customer(
       id: 1,
@@ -29,9 +33,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void insertIntoDatabase() async {
-    MemoDbProvider memoDb = MemoDbProvider();
-    var memos = await memoDb.fetchMemos();
-    print(memos[0].note); //Title 1
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isLoggedIn', true);//Title 1
   }
 
   GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
@@ -123,6 +126,12 @@ class _LoginScreenState extends State<LoginScreen> {
 //                     final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
 //                     provider.login();
                       provider.login();
+                      if(provider.isSigningIn == true) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomeScreen() 
+                          ));
+                        }
                   },
                   borderRadius: BorderRadius.circular(10),
                   child: Container(
@@ -204,9 +213,10 @@ class _LoginScreenState extends State<LoginScreen> {
             GestureDetector(
               child: InkWell(
                 onTap: () {
-//                  insertIntoDatabase();
-//                   _logOut();
-                  provider.logout();
+                 insertIntoDatabase();
+                  // _logOut();
+                  // provider.logout();
+                  
 //                   print(provider.isSigningIn);
 
                 },

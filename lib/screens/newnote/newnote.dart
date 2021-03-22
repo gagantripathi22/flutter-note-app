@@ -102,7 +102,7 @@ class _NewNoteState extends State<NewNote> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        addNote();
+        // addNote();
         Navigator.pop(context, {
           'title': title,
           'note': note,
@@ -141,8 +141,11 @@ class _NewNoteState extends State<NewNote> {
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(12),
                                 onTap: () {
-                                  addNote();
-                                  Navigator.pop(context);
+                                  Navigator.pop(context, {
+                                    'title': title,
+                                    'note': note,
+                                    'color': selectedNoteColor,
+                                  });
                                 },
                                 child: Container(
                                   height: 36,
