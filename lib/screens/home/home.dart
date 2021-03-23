@@ -9,6 +9,7 @@ import 'package:note_app/models/database_helper.dart';
 import 'package:note_app/models/customer_model.dart';
 import 'package:note_app/services/note_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:note_app/screens/search/search.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -294,7 +295,7 @@ class HomeScreenState extends State<HomeScreen> {
                 left: 17,
                 right: 17,
               ),
-              height: 78,
+              height: MediaQuery.of(context).padding.top + 52,
               // color: Colors.white,
               child: Stack(
 //                crossAxisAlignment: CrossAxisAlignment.start,
@@ -355,44 +356,46 @@ class HomeScreenState extends State<HomeScreen> {
                   Positioned(
                       bottom: 7,
                       right: 0,
-//                    margin: const EdgeInsets.only(bottom: 0),
-                      child: GestureDetector(
-                        child: Container(
-                          decoration: new BoxDecoration(
-                            color: Color(0xff3b3b3b),
-//                            color: Color(0xffe8e8e8),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Material(
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(12),
-                              onTap: () {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: Text('Search button clicked'),
-                                ));
-                              },
-                              child: Container(
-                                height: 36,
-                                width: 36,
-                                padding: const EdgeInsets.all(8),
-                                decoration: new BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Image(
-                                  image: AssetImage(
-                                      'assets/images/icon-search.png'),
-                                  color: Colors.white,
-                                  // color: Colors.black,
-                                  height: 20,
-                                  width: 20,
-                                ),
-                              ),
-                            ),
-                            color: Colors.transparent,
-                          ),
-                        ),
-                      )),
+                      child: OpenContainer(
+//                                  closedBuilder: (context, action) (
+//                                    _buildListItem(context, snapshot.data.docs[index]),
+//                                  ),
+                                  closedColor: Color(0xff252525),
+                                  closedElevation: 0,
+                                  transitionDuration: Duration(milliseconds: 350),
+
+                                  openColor: Color(0xff252525),
+                                  closedBuilder: (context, action) {
+                                    return Container(
+                                      decoration: new BoxDecoration(
+                                        color: Color(0xff3b3b3b),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Container(
+                                        height: 36,
+                                        width: 36,
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: new BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Image(
+                                          image: AssetImage(
+                                              'assets/images/icon-search.png'),
+                                          color: Colors.white,
+                                          // color: Colors.black,
+                                          height: 20,
+                                          width: 20,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  openBuilder: (context, action) {
+                                    return Search();
+                                  },
+                                  tappable: true,
+                                )
+                    )
+                  
                 ],
               ),
             ),
