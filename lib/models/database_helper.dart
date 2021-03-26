@@ -80,6 +80,8 @@ class MemoDbProvider {
     return result;
   }
 
+
+
   Future getAllNotes() async {
 //     var dbClient = await db;
 //     var result = await dbClient.query(table, columns: [id, columnTitle, columnDescription]);
@@ -88,6 +90,15 @@ class MemoDbProvider {
 //     return result.toList();
     final db = await init();
     var result = await db.rawQuery('SELECT * FROM Memos ORDER BY id DESC');
+    return result.toList();
+  }
+  
+  Future getSearchResult(keyword) async {
+    final db = await init();
+    var result = await db.rawQuery("SELECT * FROM Memos "
+        "where title LIKE '%" + keyword + "%' "
+        "OR note LIKE '%" + keyword + "%'"
+    );
     return result.toList();
   }
 }

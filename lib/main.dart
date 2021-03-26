@@ -17,14 +17,14 @@ void main() async {
     prefs.setBool('isLoggedIn', false);
   // prefs.setBool('isLoggedIn', false);
   await Firebase.initializeApp();
-  // if(prefs.getBool('isLoggedIn') == true) {
-  //   // runApp(MyApp());
-  //   runApp(YourApp());
-  // } else {
-  //   // runApp(YourApp());
-  //   runApp(MyApp());
-  // }
-  runApp(YourApp());
+  if(prefs.getBool('isLoggedIn') == true) {
+    // runApp(MyApp());
+    runApp(YourApp());
+  } else {
+    // runApp(YourApp());
+    runApp(MyApp());
+  }
+  // runApp(YourApp());
 }
 
 class MyApp extends StatelessWidget {

@@ -37,9 +37,9 @@ class _NoteScreenState extends State<NoteScreen> {
     super.initState();
     _titleController = new TextEditingController(text: widget.title);
     _noteController = new TextEditingController(text: widget.note);
-    // setState(() {
-      // selectedNoteColor = widget.note_color;
-    // });
+    setState(() {
+      selectedNoteColor = widget.note_color;
+    });
   }
 
   Widget _colorListItem(color) {
@@ -103,7 +103,7 @@ class _NoteScreenState extends State<NoteScreen> {
                   left: 17,
                   right: 17,
                 ),
-                height: 78,
+                height: MediaQuery.of(context).padding.top + 52,
                 // color: Colors.white,
                 child: Stack(
 //                crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,6 +197,8 @@ class _NoteScreenState extends State<NoteScreen> {
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(12),
                                 onTap: () {
+                                  print("KOLOR : ");
+                                  print(selectedNoteColor);
                                   Navigator.pop(context, {
                                   'id': widget.note_id,
                                   'title': title,

@@ -122,7 +122,7 @@ class _NewNoteState extends State<NewNote> {
                   left: 17,
                   right: 17,
                 ),
-                height: 78,
+                height: MediaQuery.of(context).padding.top + 52,
                 // color: Colors.white,
                 child: Stack(
 //                crossAxisAlignment: CrossAxisAlignment.start,

@@ -9,6 +9,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:note_app/services/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
 
 import '../home/home.dart';
 
@@ -48,6 +49,29 @@ class _LoginScreenState extends State<LoginScreen> {
 
   GoogleSignInProvider provider = new GoogleSignInProvider();
 
+  Timer timer;
+
+  void checkLoginStatus() {
+    if(provider.isSigningIn == true) {
+      dispose();
+      Navigator.pushReplacement (
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()
+          ));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    timer = Timer.periodic(Duration(seconds: 2), (Timer t) => checkLoginStatus());
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -168,92 +192,92 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-            GestureDetector(
-              child: InkWell(
-                onTap: () {
+//             GestureDetector(
+//               child: InkWell(
+//                 onTap: () {
+// //                  insertIntoDatabase();
+// //                   _logOut();
+// //                   print(provider.isSigningIn);
+//                   _getLoginStatus();
+//                 },
+//                 borderRadius: BorderRadius.circular(10),
+//                 child: Container(
+//                   height: 50,
+//                   padding: const EdgeInsets.only(left: 15, right: 15),
+//                   decoration: new BoxDecoration(
+// //                  color: Color(0xffe8e8e8),
+//                     border: Border.all(color: Color(0xff4f4f4f)),
+//                     borderRadius: BorderRadius.circular(10),
+//                   ),
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.center,
+//                     crossAxisAlignment: CrossAxisAlignment.center,
+//                     children: <Widget>[
+//                       Image(
+//                         image: AssetImage('assets/images/google-logo.png'),
+//                         height: 26,
+//                         width: 26,
+//                       ),
+//                       Container(
+//                         margin: const EdgeInsets.only(left: 10),
+//                         child: Text(
+//                           "Sign up with Google",
+//                           style: TextStyle(
+//                             color: Colors.white,
+//                             fontSize: 15,
+//                             fontWeight: FontWeight.w500,
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             GestureDetector(
+//               child: InkWell(
+//                 onTap: () {
 //                  insertIntoDatabase();
-//                   _logOut();
-//                   print(provider.isSigningIn);
-                  _getLoginStatus();
-                },
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  height: 50,
-                  padding: const EdgeInsets.only(left: 15, right: 15),
-                  decoration: new BoxDecoration(
-//                  color: Color(0xffe8e8e8),
-                    border: Border.all(color: Color(0xff4f4f4f)),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Image(
-                        image: AssetImage('assets/images/google-logo.png'),
-                        height: 26,
-                        width: 26,
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(left: 10),
-                        child: Text(
-                          "Sign up with Google",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            GestureDetector(
-              child: InkWell(
-                onTap: () {
-                 insertIntoDatabase();
-                  // _logOut();
-                  // provider.logout();
-                  
-//                   print(provider.isSigningIn);
-
-                },
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  height: 50,
-                  padding: const EdgeInsets.only(left: 15, right: 15),
-                  decoration: new BoxDecoration(
-//                  color: Color(0xffe8e8e8),
-                    border: Border.all(color: Color(0xff4f4f4f)),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Image(
-                        image: AssetImage('assets/images/google-logo.png'),
-                        height: 26,
-                        width: 26,
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(left: 10),
-                        child: Text(
-                          "Sign up with Google",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+//                   // _logOut();
+//                   // provider.logout();
+//
+// //                   print(provider.isSigningIn);
+//
+//                 },
+//                 borderRadius: BorderRadius.circular(10),
+//                 child: Container(
+//                   height: 50,
+//                   padding: const EdgeInsets.only(left: 15, right: 15),
+//                   decoration: new BoxDecoration(
+// //                  color: Color(0xffe8e8e8),
+//                     border: Border.all(color: Color(0xff4f4f4f)),
+//                     borderRadius: BorderRadius.circular(10),
+//                   ),
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.center,
+//                     crossAxisAlignment: CrossAxisAlignment.center,
+//                     children: <Widget>[
+//                       Image(
+//                         image: AssetImage('assets/images/google-logo.png'),
+//                         height: 26,
+//                         width: 26,
+//                       ),
+//                       Container(
+//                         margin: const EdgeInsets.only(left: 10),
+//                         child: Text(
+//                           "Sign up with Google",
+//                           style: TextStyle(
+//                             color: Colors.white,
+//                             fontSize: 15,
+//                             fontWeight: FontWeight.w500,
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
           ],
         ),
       ),

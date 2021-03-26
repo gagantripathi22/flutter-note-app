@@ -10,6 +10,9 @@ import 'package:note_app/models/customer_model.dart';
 import 'package:note_app/services/note_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:note_app/screens/search/search.dart';
+import 'package:note_app/services/firestore_sync.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:note_app/screens/sync/sync.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -27,7 +30,7 @@ class HomeScreenState extends State<HomeScreen> {
   String _returnedData;
 
   _updateNote(information, document, index) async {
-    if (information['title'] != '' || information['note'] != '') {
+    if (information['title'] != '' || information['note'] != '' || information['color'] != document['color']) {
       if(information['title'] == '') information['title'] = document['title'];
       if(information['note'] == '') information['note'] = document['note'];
       final memo = Customer(
@@ -119,20 +122,15 @@ class HomeScreenState extends State<HomeScreen> {
   Widget _buildListItem(context, document, index) {
     return GestureDetector(
       child: Container(
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              _navigateToNoteScreen(context, document, index);
-            },
+
             child: Container(
               margin: const EdgeInsets.only(bottom: 8, right: 10, left: 10),
-              padding: const EdgeInsets.only(
-                top: 15,
-                left: 15,
-                bottom: 11,
-                right: 15,
-              ),
+              // padding: const EdgeInsets.only(
+              //   top: 12,
+              //   left: 15,
+              //   bottom: 11,
+              //   right: 15,
+              // ),
               constraints: BoxConstraints(
 //                maxHeight: 100, minHeight: 80,
               ),
@@ -143,35 +141,50 @@ class HomeScreenState extends State<HomeScreen> {
                     color: Color(int.parse(document['color'])).withOpacity(.7)),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    child: Text(
-                      document['title'],
-                      style: TextStyle(
-                        // color: Color(0xff1b1c17),
-                        color: Colors.white,
-                        fontSize: 17,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    _navigateToNoteScreen(context, document, index);
+                  },
+              child: Container(
+                padding: const EdgeInsets.only(
+                  top: 12,
+                  left: 15,
+                  bottom: 11,
+                  right: 15,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      child: Text(
+                        document['title'],
+                        style: TextStyle(
+                          // color: Color(0xff1b1c17),
+                            color: Colors.white,
+                            fontSize: 17,
+                            height: 1.4
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                    alignment: Alignment.centerRight,
-                    margin: EdgeInsets.only(
-                      top: 5,
+                    Container(
+                      alignment: Alignment.centerRight,
+                      margin: EdgeInsets.only(
+                        top: 5,
+                      ),
+                      child: Text(
+                        'March 7, 2020',
+                        style: TextStyle(
+                          // color: Color(0xff1b1c17).withOpacity(.5),
+                            color: Color(0xffffffff).withOpacity(.5),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w300),
+                      ),
                     ),
-                    child: Text(
-                      'March 7, 2020',
-                      style: TextStyle(
-                        // color: Color(0xff1b1c17).withOpacity(.5),
-                          color: Color(0xffffffff).withOpacity(.5),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w300),
-                    ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+              )
             ),
           ),
         ),
@@ -277,23 +290,168 @@ class HomeScreenState extends State<HomeScreen> {
       text = result;
     });
   }
+  // List temp_list;
+  handleSync() async {
+    FirestoreSync sync = new FirestoreSync();
+    // print(sync.getLocalDatabase());
+    List temp_list = await sync.getLocalDatabase();
+
+    print(temp_list[1]);
+    print(temp_list.length);
+  }
+
+  final user = FirebaseAuth.instance.currentUser;
+
+  Widget _drawer(context) {
+    return Container(
+      color: Color(0xff252525),
+      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 15, ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.only(left: 12, right: 12, bottom: 20),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  maxRadius: 27,
+                  backgroundImage: NetworkImage(user.photoURL),
+                ),
+                Container(
+                  padding: EdgeInsets.only(left: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user.displayName,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 5),
+                        child: Text(
+                          user.email,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(.6),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+          GestureDetector(
+            child: Container(
+              child: Material(
+                color: Color(0xff252525),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SyncScreen()),
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 15),
+                    width:  double.infinity,
+                    decoration: new BoxDecoration(
+                      // color: Color(0xff252525),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(right: 16),
+                          child: Image(
+                            image:
+                            AssetImage('assets/images/icon-sync.png'),
+                            color: Colors.white,
+                            // color: Colors.black,
+                            height: 22,
+                            width: 23,
+                          ),
+                        ),
+                        Text(
+                          'Sync notes',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                          ),
+                        )
+                      ],
+                    )
+                  ),
+                ),
+              ),
+            ),
+          ),
+          GestureDetector(
+            child: Container(
+              child: Material(
+                color: Color(0xff252525),
+                child: InkWell(
+                  onTap: () {
+                    print('drawer item');
+                  },
+                  child: Container(
+                      padding: EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 15),
+                      width:  double.infinity,
+                      decoration: new BoxDecoration(
+                        // color: Color(0xff252525),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(right: 16),
+                            child: Image(
+                              image:
+                              AssetImage('assets/images/icon-logout.png'),
+                              color: Colors.white,
+                              // color: Colors.black,
+                              height: 24,
+                              width: 25,
+                            ),
+                          ),
+                          Text(
+                            'Log out',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                            ),
+                          )
+                        ],
+                      )
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
 
 
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
     MemoDbProvider memoDb = MemoDbProvider();
+
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Color(0xff252525),
-      // backgroundColor: Colors.white,
-      
       body: Container(
         child: Column(
           children: <Widget>[
             Container(
               width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.only(
-                left: 17,
-                right: 17,
+                left: 15,
+                right: 15,
               ),
               height: MediaQuery.of(context).padding.top + 52,
               // color: Colors.white,
@@ -301,58 +459,86 @@ class HomeScreenState extends State<HomeScreen> {
 //                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Positioned(
+                      bottom: 7,
+                      left: -2,
+//                    margin: const EdgeInsets.only(bottom: 0),
+                      child: GestureDetector(
+                        onTap: () {
+                          _scaffoldKey.currentState.openDrawer();
+                        },
+                        child: Container(
+                          height: 42,
+                          width: 22,
+
+                          padding: const EdgeInsets.only(top: 6, ),
+                          decoration: new BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            // color: Colors.pink,
+                          ),
+                          child: Image(
+                            image:
+                            AssetImage('assets/images/icon-drawer.png'),
+                            color: Colors.white,
+                            // color: Colors.black,
+                            height: 25,
+                            width: 22,
+                          ),
+                        ),
+                      )),
+                  Positioned(
                     bottom: 11,
+                    // bottom: 14,
+                    left: 27,
+                    // left: 29,
                     child: Text(
                       "Notes",
                       style: TextStyle(
 //                        color: Colors.white,
                         color: Colors.white,
                         fontSize: 23,
+                        // fontSize: 18,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
                   ),
-                  Positioned(
-                      bottom: 7,
-                      right: 45,
-//                    margin: const EdgeInsets.only(bottom: 0),
-                      child: GestureDetector(
-                        child: Container(
-                          decoration: new BoxDecoration(
-                            color: Color(0xff3b3b3b),
-//                            color: Color(0xffe8e8e8),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Material(
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(12),
-                              onTap: () {
-                                // updateNote();
-                                // Navigator.pop(context);
-                                // testDB();
-                                removeList();
-                              },
-                              child: Container(
-                                height: 36,
-                                width: 36,
-                                padding: const EdgeInsets.all(8),
-                                decoration: new BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Image(
-                                  image:
-                                      AssetImage('assets/images/icon-sync.png'),
-                                  color: Colors.white,
-                                  // color: Colors.black,
-                                  height: 20,
-                                  width: 20,
-                                ),
-                              ),
-                            ),
-                            color: Colors.transparent,
-                          ),
-                        ),
-                      )),
+//                   Positioned(
+//                       bottom: 7,
+//                       right: 45,
+// //                    margin: const EdgeInsets.only(bottom: 0),
+//                       child: GestureDetector(
+//                         child: Container(
+//                           decoration: new BoxDecoration(
+//                             color: Color(0xff3b3b3b),
+// //                            color: Color(0xffe8e8e8),
+//                             borderRadius: BorderRadius.circular(12),
+//                           ),
+//                           child: Material(
+//                             child: InkWell(
+//                               borderRadius: BorderRadius.circular(12),
+//                               onTap: () {
+//                                 handleSync();
+//                               },
+//                               child: Container(
+//                                 height: 36,
+//                                 width: 36,
+//                                 padding: const EdgeInsets.all(8),
+//                                 decoration: new BoxDecoration(
+//                                   borderRadius: BorderRadius.circular(12),
+//                                 ),
+//                                 child: Image(
+//                                   image:
+//                                       AssetImage('assets/images/icon-sync.png'),
+//                                   color: Colors.white,
+//                                   // color: Colors.black,
+//                                   height: 20,
+//                                   width: 20,
+//                                 ),
+//                               ),
+//                             ),
+//                             color: Colors.transparent,
+//                           ),
+//                         ),
+//                       )),
                   Positioned(
                       bottom: 7,
                       right: 0,
@@ -390,12 +576,17 @@ class HomeScreenState extends State<HomeScreen> {
                                     );
                                   },
                                   openBuilder: (context, action) {
-                                    return Search();
+                                    return Search(
+                                      note_list: items,
+                                      deleteNote: _deleteNote,
+                                      updateNote: _updateNote,
+                                      list_length: note_list.length,
+                                    );
                                   },
                                   tappable: true,
                                 )
                     )
-                  
+
                 ],
               ),
             ),
@@ -428,7 +619,7 @@ class HomeScreenState extends State<HomeScreen> {
           _navigateToNewNoteScreen(context)
         },
       ),
-      drawer: Drawer(child: Text('test'),),
+      drawer: Drawer(child: _drawer(context),),
     );
   }
 }
