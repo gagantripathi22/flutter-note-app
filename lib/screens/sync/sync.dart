@@ -22,6 +22,12 @@ class SyncScreen extends StatefulWidget {
 }
 
 class SyncScreenState extends State<SyncScreen> {
+  readTimeStamp() async {
+    FirestoreSync test = new FirestoreSync();
+    test.storingInFirestore();
+    // List tlist = await test.getLocalDatabase();
+    // print(tlist.length);
+  }
   @override
   Widget build(BuildContext context) {
     MemoDbProvider memoDb = MemoDbProvider();
@@ -79,22 +85,6 @@ class SyncScreenState extends State<SyncScreen> {
                           ),
                         ),
                       )),
-//                   Positioned(
-//                     bottom: 11,
-//                     // bottom: 14,
-//                     left: 44,
-//                     // left: 29,
-//                     child: Text(
-//                       "Sync",
-//                       style: TextStyle(
-// //                        color: Colors.white,
-//                         color: Colors.white,
-//                         fontSize: 23,
-//                         // fontSize: 18,
-//                         fontWeight: FontWeight.w400,
-//                       ),
-//                     ),
-//                   ),
                 ],
               ),
             ),
@@ -135,7 +125,7 @@ class SyncScreenState extends State<SyncScreen> {
                                   color: Colors.transparent,
                                   child: InkWell(
                                     onTap: () {
-
+                                      readTimeStamp();
                                     },
                                     borderRadius: BorderRadius.circular(10),
                                     child: Container(

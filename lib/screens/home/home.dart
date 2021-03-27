@@ -38,6 +38,7 @@ class HomeScreenState extends State<HomeScreen> {
         title: information['title'],
         note: information['note'],
         color: information['color'],
+        date: _dateFormatter(),
       );
       MemoDbProvider memoDb = MemoDbProvider();
       memoDb.updateMemo(document['id'], memo);
@@ -49,9 +50,95 @@ class HomeScreenState extends State<HomeScreen> {
           "title": information['title'],
           "note": information['note'],
           "color": information['color'],
+          "date": _dateFormatter(),
         };
       });
     }
+  }
+
+  String _dateFormatter() {
+    var currDt = DateTime.now();
+    String formattedDate = currDt.year.toString() + '-';
+    formattedDate += currDt.month < 10 ? '0' + currDt.month.toString() + '-' : currDt.month.toString() + '-';
+    formattedDate += currDt.day < 10 ? '0' + currDt.day.toString() + ' ' : currDt.day.toString() + ' ';
+    formattedDate += currDt.hour < 10 ? '0' + currDt.hour.toString() + ':' : currDt.hour.toString() + ':';
+    formattedDate += currDt.minute < 10 ? '0' + currDt.minute.toString() + ':' : currDt.minute.toString() + ':';
+    formattedDate += currDt.second < 10 ? '0' + currDt.second.toString(): currDt.second.toString();
+    return formattedDate;
+  }
+
+  String _getCurrDay() {
+    var currDt = DateTime.now();
+    String currDay = currDt.day < 10 ? '0' + currDt.day.toString() : currDt.day.toString();
+    return currDay;
+  }
+
+  String _getCurrMonth() {
+    var currDt = DateTime.now();
+    String currMonth = currDt.month < 10 ? '0' + currDt.month.toString() : currDt.month.toString();
+    return currMonth;
+  }
+
+  String _getCurrYear() {
+    var currDt = DateTime.now();
+    String currYear = currDt.year < 10 ? '0' + currDt.year.toString() : currDt.year.toString();
+    return currYear;
+  }
+
+  _numMonthToWord(monthNumber) {
+    if(monthNumber == 1) return "Jan";
+    else if(monthNumber == 2) return "Feb";
+    else if(monthNumber == 3) return "Mar";
+    else if(monthNumber == 4) return "Apr";
+    else if(monthNumber == 5) return "May";
+    else if(monthNumber == 6) return "June";
+    else if(monthNumber == 7) return "July";
+    else if(monthNumber == 8) return "Aug";
+    else if(monthNumber == 9) return "Sept";
+    else if(monthNumber == 10) return "Oct";
+    else if(monthNumber == 11) return "Nov";
+    else if(monthNumber == 12) return "Dec";
+  }
+
+  _getAmPmFormatTime(hour, minute) {
+    String formattedTime;
+    if(hour == 0) {
+      formattedTime = (12).toString() + ':' + minute + ' am';
+    } else
+    if(hour > 12) {
+      formattedTime = (hour-12).toString() + ':' + minute + ' pm';
+    } else {
+      formattedTime = (hour).toString() + ':' + minute + ' am';
+    }
+    return formattedTime;
+  }
+
+  _getFormatDDMonthYYYY(dateTimeFormat) {
+    var currDt = DateTime.now();
+    String temp = dateTimeFormat;
+    String year = temp.substring(0, 4);
+    String month = temp.substring(5, 7);
+    String day = temp.substring(8, 10);
+    String month2 = int.parse(month) < 10 ? '0' + month : month ;
+    String day2 = int.parse(day) < 10 ? '0' + day : day;
+    String hour = temp.substring(11, 13);
+    String minute = temp.substring(14, 16);
+    String sec = temp.substring(17, 19);
+    String formattedDate = 'haha';
+    print(year + ' ' + currDt.year.toString());
+    print(month2 + ' ' + currDt.month.toString());
+    print(day2 + ' ' + currDt.day.toString());
+    if(int.parse(year) == currDt.year) {
+      if (int.parse(month2) == currDt.month && int.parse(day2) == currDt.day) {
+        formattedDate = _getAmPmFormatTime(int.parse(hour), minute);
+      } else {
+        formattedDate = day2 + ' ' + _numMonthToWord(int.parse(month2));
+      }
+    // }
+    } else {
+      formattedDate = day2 + ' ' + _numMonthToWord(int.parse(month2)) + ' ' + year;
+    }
+    return formattedDate;
   }
 
   _addNewNote(information) async {
@@ -68,6 +155,7 @@ class HomeScreenState extends State<HomeScreen> {
         title: information['title'],
         note: information['note'],
         color: information['color'],
+        date: _dateFormatter(),
       );
       MemoDbProvider memoDb = MemoDbProvider();
       await memoDb.addItem(memo);
@@ -77,6 +165,7 @@ class HomeScreenState extends State<HomeScreen> {
           "title": information['title'],
           "note": information['note'],
           "color": information['color'],
+          "date": _dateFormatter(),
         });
       });
     }
@@ -97,7 +186,7 @@ class HomeScreenState extends State<HomeScreen> {
       context,
       MaterialPageRoute(builder: (context) => NoteScreen(
         title: document['title'],
-        date: '7 March 2020',
+        date: _getFormatDDMonthYYYY(document['date']),
         note: document['note'],
         note_id: document['id'],
         note_color: document['color'],
@@ -122,15 +211,8 @@ class HomeScreenState extends State<HomeScreen> {
   Widget _buildListItem(context, document, index) {
     return GestureDetector(
       child: Container(
-
             child: Container(
               margin: const EdgeInsets.only(bottom: 8, right: 10, left: 10),
-              // padding: const EdgeInsets.only(
-              //   top: 12,
-              //   left: 15,
-              //   bottom: 11,
-              //   right: 15,
-              // ),
               constraints: BoxConstraints(
 //                maxHeight: 100, minHeight: 80,
               ),
@@ -143,49 +225,54 @@ class HomeScreenState extends State<HomeScreen> {
               ),
               child: Material(
                 color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    _navigateToNoteScreen(context, document, index);
-                  },
-              child: Container(
-                padding: const EdgeInsets.only(
-                  top: 12,
-                  left: 15,
-                  bottom: 11,
-                  right: 15,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      child: Text(
-                        document['title'],
-                        style: TextStyle(
-                          // color: Color(0xff1b1c17),
-                            color: Colors.white,
-                            fontSize: 17,
-                            height: 1.4
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: InkWell(
+                      onTap: () {
+                        _navigateToNoteScreen(context, document, index);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.only(
+                          top: 12,
+                          left: 15,
+                          bottom: 11,
+                          right: 15,
                         ),
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.centerRight,
-                      margin: EdgeInsets.only(
-                        top: 5,
-                      ),
-                      child: Text(
-                        'March 7, 2020',
-                        style: TextStyle(
-                          // color: Color(0xff1b1c17).withOpacity(.5),
-                            color: Color(0xffffffff).withOpacity(.5),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w300),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              child: Text(
+                                document['title'],
+                                style: TextStyle(
+                                  // color: Color(0xff1b1c17),
+                                    color: Colors.white,
+                                    fontSize: 17,
+                                    height: 1.4
+                                ),
+                              ),
+                            ),
+                            Container(
+                              alignment: Alignment.centerRight,
+                              margin: EdgeInsets.only(
+                                top: 5,
+                              ),
+                              child: Text(
+                                _getFormatDDMonthYYYY(document['date']),
+                                style: TextStyle(
+                                  // color: Color(0xff1b1c17).withOpacity(.5),
+                                    color: Color(0xffffffff).withOpacity(.5),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w300),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                  ),
+                )
           ),
         ),
       ),
@@ -217,51 +304,8 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   void removeList() async {
-    // print(_returnedData);
-
     final prefs = await SharedPreferences.getInstance();
     prefs.setBool('isLoggedIn', false);
-
-    // MemoDbProvider memoDb = MemoDbProvider();
-    //
-    // memoDb.deleteMemo(13);
-
-
-    // setState(() {
-    //   note_list.removeAt(1);
-    // });
-    // print('is removed');
-
-    // setState(() {
-    //   nl.note_list.insert(0,{
-    //     "id": 100,
-    //     "title": 'ehy',
-    //     "note": "HOEHOE",
-    //     "color": "0xffffffff",
-    //   });
-    // });
-
-
-    // items[items.indexWhere((element) => element.id == 5)] = {
-    //       "id": 100,
-    //       "title": 'huhuihhuihuiuihuih',
-    //       "note": "HOEHOE",
-    //       "color": "0xffffffff",
-    //     };
-
-    // setState(() {
-    //   nl.note_list[3] = {
-    //     "id": 100,
-    //     "title": 'newew nigaa',
-    //     "note": "HOEHOE",
-    //     "color": "0xffffffff",
-    //   };
-    // });
-
-
-    // items[2].title = 'Pending';
-
-
   }
 
   @override
@@ -490,16 +534,22 @@ class HomeScreenState extends State<HomeScreen> {
                     // bottom: 14,
                     left: 27,
                     // left: 29,
-                    child: Text(
-                      "Notes",
-                      style: TextStyle(
+                    child: GestureDetector(
+                      onTap: () {
+                        // print(_dateFormatter());
+                        // print(_getFormatDDMonthYYYY());
+                      },
+                      child: Text(
+                        "Notes",
+                        style: TextStyle(
 //                        color: Colors.white,
-                        color: Colors.white,
-                        fontSize: 23,
-                        // fontSize: 18,
-                        fontWeight: FontWeight.w400,
+                          color: Colors.white,
+                          fontSize: 23,
+                          // fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
-                    ),
+                    )
                   ),
 //                   Positioned(
 //                       bottom: 7,

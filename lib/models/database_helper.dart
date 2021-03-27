@@ -20,7 +20,8 @@ class MemoDbProvider {
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           title TEXT,
           note TEXT,
-          color TEXT)""");
+          color TEXT,
+          date DATETIME)""");
     });
   }
   Future<Database> deleteDatabase() async {
@@ -51,6 +52,7 @@ class MemoDbProvider {
         title: maps[i]['title'],
         note: maps[i]['note'],
         color: maps[i]['color'],
+        date: maps[i]['date'],
       );
     });
   }

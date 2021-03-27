@@ -89,6 +89,7 @@ class _NoteScreenState extends State<NoteScreen> {
           'color': selectedNoteColor,
           'isDelete': false,
           'noteIndex': widget.id_in_list,
+          'date': widget.date,
         });
         return false;
       },
@@ -206,6 +207,7 @@ class _NoteScreenState extends State<NoteScreen> {
                                   'color': selectedNoteColor,
                                   'isDelete': false,
                                   'noteIndex': widget.id_in_list,
+                                  'date': widget.date,
                                 });
                                 },
                                 child: Container(
@@ -256,6 +258,7 @@ class _NoteScreenState extends State<NoteScreen> {
                                     'color': selectedNoteColor,
                                     'isDelete': true,
                                     'noteIndex': widget.id_in_list,
+                                    'date': widget.date,
                                   });
                                 },
                                 child: Container(
@@ -320,7 +323,8 @@ class _NoteScreenState extends State<NoteScreen> {
                             alignment: Alignment.topLeft,
                             child: Text(
                               // date == null ? 'Loading': 'Edited on ' + date,
-                              widget.note_id.toString(),
+                              // widget.note_id.toString(),
+                              'Edited on ' + widget.date,
                               style: TextStyle(
                                   fontSize: 15,
                                   color: Colors.white.withOpacity(.7),
