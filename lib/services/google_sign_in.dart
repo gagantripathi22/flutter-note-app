@@ -77,7 +77,6 @@ class GoogleSignInProvider extends ChangeNotifier {
     FirebaseAuth.instance.signOut();
     final prefs = await SharedPreferences.getInstance();
     prefs.setBool('isLoggedIn', false);
-
     MemoDbProvider memoDb = MemoDbProvider();
     memoDb.deleteDatabase();
   }

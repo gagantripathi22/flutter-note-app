@@ -13,6 +13,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 //  MemoDbProvider memoDb = MemoDbProvider();
   final prefs = await SharedPreferences.getInstance();
+  prefs.setBool('isSyncInProgress', false);
   if(prefs.getBool('isLoggedIn') == null)
     prefs.setBool('isLoggedIn', false);
   // prefs.setBool('isLoggedIn', false);

@@ -13,6 +13,9 @@ import 'package:note_app/screens/search/search.dart';
 import 'package:note_app/services/firestore_sync.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:note_app/screens/sync/sync.dart';
+import 'package:note_app/services/google_sign_in.dart';
+import 'package:note_app/screens/login/login.dart';
+import 'package:note_app/screens/fetchnote/fetchnote.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -439,7 +442,14 @@ class HomeScreenState extends State<HomeScreen> {
                 color: Color(0xff252525),
                 child: InkWell(
                   onTap: () {
-                    print('drawer item');
+                    // handleLogOut() async {
+                      GoogleSignInProvider provider = new GoogleSignInProvider();
+                      Navigator.push (
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()
+                        ));
+                      provider.logout();
+                    // }
                   },
                   child: Container(
                       padding: EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 15),

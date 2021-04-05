@@ -10,6 +10,7 @@ import 'package:note_app/services/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
+import 'package:note_app/screens/fetchnote/fetchnote.dart';
 
 import '../home/home.dart';
 
@@ -20,6 +21,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool isSignInSucess;
+  Timer timer;
+  bool isLoggedIn = false;
 
   void initializeDatabase() async {
     final memo = Customer(
@@ -40,8 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
-  bool isLoggedIn = false;
-
   _getLoginStatus() async {
     final prefs = await SharedPreferences.getInstance();
     print(prefs.getBool('isLoggedIn'));
@@ -49,14 +50,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   GoogleSignInProvider provider = new GoogleSignInProvider();
 
-  Timer timer;
-
   void checkLoginStatus() {
     if(provider.isSigningIn == true) {
       dispose();
       Navigator.pushReplacement (
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()
+          MaterialPageRoute(builder: (context) => FetchNoteScreen()
           ));
     }
   }
@@ -87,13 +86,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 right: 20,
                 bottom: 20,
                 top: 20,
-              ),
-              decoration: BoxDecoration(
-//                color: Colors.red,
-//                image: DecorationImage(
-//                  image: AssetImage('assets/images/login_banner.jpg'),
-//                  fit: BoxFit.fill
-//                )
               ),
               child: Stack(
                 children: <Widget>[
@@ -137,25 +129,27 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
+            Expanded(
+              child: Container(
+
+              )
+            ),
             Container(
               alignment: Alignment.center,
-              margin: const EdgeInsets.only(top: 30),
+              margin: const EdgeInsets.only(top: 30, bottom: 5),
               padding: const EdgeInsets.all(20),
 //              color: Colors.lightBlue,
               child: GestureDetector(
                 child: InkWell(
                   onTap: () {
-//                    initializeDatabase();
-//                     _logIn();
-//                     final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
-//                     provider.login();
-                      provider.login();
-                      if(provider.isSigningIn == true) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomeScreen() 
-                          ));
-                        }
+                    provider.login();
+                    if(provider.isSigningIn == true) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => FetchNoteScreen()
+                        ));
+                    }
                   },
                   borderRadius: BorderRadius.circular(10),
                   child: Container(

@@ -1,18 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:animations/animations.dart';
-import 'package:note_app/screens/note/note.dart';
-import 'package:note_app/screens/newnote/newnote.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
 import 'package:note_app/models/database_helper.dart';
-import 'package:note_app/models/customer_model.dart';
-import 'package:note_app/services/note_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:note_app/screens/search/search.dart';
 import 'package:note_app/services/firestore_sync.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:async';
 
 class SyncScreen extends StatefulWidget {
   @override
@@ -22,16 +13,63 @@ class SyncScreen extends StatefulWidget {
 }
 
 class SyncScreenState extends State<SyncScreen> {
-  readTimeStamp() async {
-    FirestoreSync test = new FirestoreSync();
-    test.storingInFirestore();
-    // List tlist = await test.getLocalDatabase();
-    // print(tlist.length);
+  int countOfNotes = 0;
+  int syncProgressCount = 40;
+  FirestoreSync sService = new FirestoreSync();
+
+  void InitState() async {
+    int tempCount = await sService.getTotalLengthOfNotes();
+    setState(() {
+      countOfNotes = tempCount;
+    });
   }
+
+  Timer timer;
+
+  @override
+  void initState() {
+    super.initState();
+    timer = Timer.periodic(Duration(seconds: 5), (Timer t) => getProgressCount());
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  bool isSyncProgress = false;
+  getProgressCount() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool tempStatus = prefs.getBool('isSyncInProgress');
+
+    print(isSyncProgress);
+    if(tempStatus) {
+      setState(() {
+        isSyncProgress = tempStatus;
+      });
+    }
+  }
+
+  runOnPop() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isSyncInProgress', false);
+  }
+
+  bool syncTriggered = false;
+
+  showPleaseWait() {
+    setState(() {
+      syncTriggered = true;
+      isSyncProgress = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    InitState();
     MemoDbProvider memoDb = MemoDbProvider();
-
+    FirestoreSync syncService = new FirestoreSync();
     return Scaffold(
       backgroundColor: Color(0xff252525),
       body: Container(
@@ -46,16 +84,13 @@ class SyncScreenState extends State<SyncScreen> {
               height: MediaQuery.of(context).padding.top + 52,
               // color: Colors.white,
               child: Stack(
-//                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Positioned(
                       bottom: 7,
-//                    margin: const EdgeInsets.only(bottom: 0),
                       child: GestureDetector(
                         child: Container(
                           decoration: new BoxDecoration(
                             color: Color(0xff3b3b3b),
-//                            color: Color(0xffe8e8e8),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Material(
@@ -63,6 +98,8 @@ class SyncScreenState extends State<SyncScreen> {
                               borderRadius: BorderRadius.circular(12),
                               onTap: () {
                                 Navigator.pop(context);
+                                runOnPop();
+                                // readTimeStamp();
                               },
                               child: Container(
                                 height: 36,
@@ -111,9 +148,46 @@ class SyncScreenState extends State<SyncScreen> {
                               ),
                             ),
                           ),
+                          Expanded(
+                            child: Center(
+                              child: IntrinsicHeight(
+                                child: Column(
+                                  children: [
+                                    Image(
+                                      image: AssetImage('assets/images/icon-cloud_sync.png'),
+                                      color: Colors.white.withOpacity(.1),
+                                      // height: 18,
+                                      // width: 26,
+                                    ),
+                                    syncTriggered == true ?
+                                      Container(
+                                        margin: EdgeInsets.only(top: 10),
+                                        child: Text(
+                                          isSyncProgress ? 'Sync completed' : 'Please wait sync in progress',
+                                          style: TextStyle(
+                                            color: Colors.lightGreenAccent,
+                                          ),
+                                        ),
+                                      )
+                                        :
+                                        Text(' ')
+                                    // Container(
+                                    //   margin: EdgeInsets.only(top: 15),
+                                    //   child: Text(
+                                    //     'Last sync on ',
+                                    //     style: TextStyle(
+                                    //       color: Colors.white,
+                                    //     ),
+                                    //   ),
+                                    // )
+                                  ],
+                                ),
+                              )
+                            )
+                          ),
                           Container(
                             alignment: Alignment.center,
-                            margin: const EdgeInsets.only(top: 30),
+                            margin: const EdgeInsets.only(top: 16),
                             padding: const EdgeInsets.all(16),
                             child: GestureDetector(
                               child: Container(
@@ -121,46 +195,54 @@ class SyncScreenState extends State<SyncScreen> {
                                   borderRadius: BorderRadius.circular(10),
                                   color: Colors.green.withOpacity(.105),
                                 ),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () {
-                                      readTimeStamp();
-                                    },
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Container(
-                                      height: 50,
-                                      padding: const EdgeInsets.only(left: 15, right: 15),
-                                      decoration: new BoxDecoration(
-                                        border: Border.all(color: Colors.green),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: <Widget>[
-                                          Image(
-                                            image: AssetImage('assets/images/icon-sync.png'),
-                                            color: Colors.white,
-                                            height: 18,
-                                            width: 26,
-                                          ),
-                                          Container(
-                                            margin: const EdgeInsets.only(left: 10),
-                                            child: Text(
-                                              "Sync with cloud",
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w400,
+                                child: GestureDetector(
+                                  onTap: ()  {
+                                    print('hello');
+                                    // readTimeStamp();
+                                  },
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () {
+                                        FirestoreSync sc = new FirestoreSync();
+                                        sc.storingInFirestore();
+                                        showPleaseWait();
+                                      },
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Container(
+                                        height: 50,
+                                        padding: const EdgeInsets.only(left: 15, right: 15),
+                                        decoration: new BoxDecoration(
+                                          border: Border.all(color: Colors.green),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: <Widget>[
+                                            Image(
+                                              image: AssetImage('assets/images/icon-sync.png'),
+                                              color: Colors.white,
+                                              height: 18,
+                                              width: 26,
+                                            ),
+                                            Container(
+                                              margin: const EdgeInsets.only(left: 10),
+                                              child: Text(
+                                                "Sync with cloud",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                )
                               )
                             ),
                           ),
