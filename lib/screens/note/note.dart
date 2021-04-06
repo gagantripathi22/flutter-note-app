@@ -324,7 +324,7 @@ class _NoteScreenState extends State<NoteScreen> {
                             child: Text(
                               // date == null ? 'Loading': 'Edited on ' + date,
                               // widget.note_id.toString(),
-                              'Edited on ' + widget.date,
+                              'Edited on ' + widget.note_id.toString(),
                               style: TextStyle(
                                   fontSize: 15,
                                   color: Colors.white.withOpacity(.7),

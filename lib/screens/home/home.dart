@@ -32,32 +32,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   String _returnedData;
 
-  _updateNote(information, document, index) async {
-    if (information['title'] != '' || information['note'] != '' || information['color'] != document['color']) {
-      if(information['title'] == '') information['title'] = document['title'];
-      if(information['note'] == '') information['note'] = document['note'];
-      final memo = Customer(
-        id: document['id'],
-        title: information['title'],
-        note: information['note'],
-        color: information['color'],
-        date: _dateFormatter(),
-      );
-      MemoDbProvider memoDb = MemoDbProvider();
-      memoDb.updateMemo(document['id'], memo);
-      print('Returned Note Color : ' + information['color']);
-      print('Returned Note Title : ' + information['title']);
-      setState(() {
-        note_list[index] = {
-          "id": document['id'],
-          "title": information['title'],
-          "note": information['note'],
-          "color": information['color'],
-          "date": _dateFormatter(),
-        };
-      });
-    }
-  }
+
 
   String _dateFormatter() {
     var currDt = DateTime.now();
@@ -144,6 +119,46 @@ class HomeScreenState extends State<HomeScreen> {
     return formattedDate;
   }
 
+  _updateNote(information, document, index) async {
+    if (information['title'] != '' || information['note'] != '' || information['color'] != document['color']) {
+      if(information['title'] == '') information['title'] = document['title'];
+      if(information['note'] == '') information['note'] = document['note'];
+      // final memo = Customer(
+      //   id: document['id'],
+      //   title: information['title'],
+      //   note: information['note'],
+      //   color: information['color'],
+      //   date: _dateFormatter(),
+      // );
+      // MemoDbProvider memoDb = MemoDbProvider();
+      // memoDb.updateMemo(document['id'], memo);
+      // print('Returned Note Color : ' + information['color']);
+      // print('Returned Note Title : ' + information['title']);
+      // setState(() {
+      //   note_list[index] = {
+      //     "id": document['id'],
+      //     "title": information['title'],
+      //     "note": information['note'],
+      //     "color": information['color'],
+      //     "date": _dateFormatter(),
+      //   };
+      // });
+
+      MemoDbProvider memoDb = new MemoDbProvider();
+      // setState(() {
+      //   note_list.removeAt(index);
+      // });
+      // print('is removed');
+      // memoDb.deleteNoteParticular(information['id'].toString());
+      _deleteNote(information, index);
+      await _addNewNote({
+        'title': information['title'],
+        'note': information['note'],
+        'color': information['color'],
+      });
+    }
+  }
+
   _addNewNote(information) async {
     if (information['title'] != '' || information['note'] != '') {
       if (information['title'] == '') {
@@ -162,16 +177,16 @@ class HomeScreenState extends State<HomeScreen> {
       );
       MemoDbProvider memoDb = MemoDbProvider();
       await memoDb.addItem(memo);
-
-      setState(() {
-        note_list.insert(0,{
-          "title": information['title'],
-          "note": information['note'],
-          "color": information['color'],
-          "date": _dateFormatter(),
-        });
-      });
+      // setState(() {
+      //   note_list.insert(0,{
+      //     "title": information['title'],
+      //     "note": information['note'],
+      //     "color": information['color'],
+      //     "date": _dateFormatter(),
+      //   });
+      // });
     }
+    testDB();
   }
 
   _deleteNote(information, index) async {
@@ -183,6 +198,7 @@ class HomeScreenState extends State<HomeScreen> {
       note_list.removeAt(index);
     });
     print('is removed');
+    testDB();
   }
 
   _navigateToNoteScreen(context, document, index) async {
@@ -312,15 +328,15 @@ class HomeScreenState extends State<HomeScreen> {
     prefs.setBool('isLoggedIn', false);
   }
 
-  @override
-  void didChangeDependencies() async {
-    super.didChangeDependencies();
-    MemoDbProvider memoDb = MemoDbProvider();
-    List memos = await memoDb.getAllNotes();
-    // print(memos[0]['title']);
-    note_list = memos;
-    // print(note_list);
-  }
+  // @override
+  // void didChangeDependencies() async {
+  //   super.didChangeDependencies();
+  //   MemoDbProvider memoDb = MemoDbProvider();
+  //   List memos = await memoDb.getAllNotes();
+  //   // print(memos[0]['title']);
+  //   note_list = memos;
+  //   // print(note_list);
+  // }
 
   String text;
 
@@ -452,12 +468,12 @@ class HomeScreenState extends State<HomeScreen> {
                 color: Color(0xff252525),
                 child: InkWell(
                   onTap: () {
-                    // GoogleSignInProvider provider = new GoogleSignInProvider();
-                    // Navigator.push (
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => LoginScreen()
-                    //   ));
-                    // provider.logout();
+                    GoogleSignInProvider provider = new GoogleSignInProvider();
+                    Navigator.push (
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()
+                      ));
+                    provider.logout();
 
                     handleLogOut();
                   },

@@ -127,4 +127,17 @@ class MemoDbProvider {
     var result = await db.rawQuery('SELECT * FROM unsyncDeletedNotes');
     return result.toList();
   }
+
+  Future deleteNoteParticular(id) async {
+    final db = await init();
+    var result = await db.rawQuery("DELETE FROM unsyncDeletedNotes WHERE id="
+        + id
+    );
+  }
+
+  Future getHighestId() async {
+    final db = await init();
+    var result = await db.rawQuery("SELECT MAX(id) from Memos");
+    return result;
+  }
 }
