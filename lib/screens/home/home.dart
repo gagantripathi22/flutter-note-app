@@ -177,6 +177,7 @@ class HomeScreenState extends State<HomeScreen> {
   _deleteNote(information, index) async {
     MemoDbProvider memoDb = MemoDbProvider();
     await memoDb.deleteMemo(information['id']);
+    await memoDb.setUnsyncDeletedNoteId(information['id'].toString());
 
     setState(() {
       note_list.removeAt(index);
@@ -347,6 +348,15 @@ class HomeScreenState extends State<HomeScreen> {
     print(temp_list.length);
   }
 
+  handleLogOut() async {
+    // final prefs = await SharedPreferences.getInstance();
+    // print(prefs.getString('lastSyncDate'));
+
+    MemoDbProvider memoDb = MemoDbProvider();
+    List temp = await memoDb.getUnsyncDeletedNoteList();
+    print(temp);
+  }
+
   final user = FirebaseAuth.instance.currentUser;
 
   Widget _drawer(context) {
@@ -442,14 +452,14 @@ class HomeScreenState extends State<HomeScreen> {
                 color: Color(0xff252525),
                 child: InkWell(
                   onTap: () {
-                    // handleLogOut() async {
-                      GoogleSignInProvider provider = new GoogleSignInProvider();
-                      Navigator.push (
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginScreen()
-                        ));
-                      provider.logout();
-                    // }
+                    // GoogleSignInProvider provider = new GoogleSignInProvider();
+                    // Navigator.push (
+                    //   context,
+                    //   MaterialPageRoute(builder: (context) => LoginScreen()
+                    //   ));
+                    // provider.logout();
+
+                    handleLogOut();
                   },
                   child: Container(
                       padding: EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 15),

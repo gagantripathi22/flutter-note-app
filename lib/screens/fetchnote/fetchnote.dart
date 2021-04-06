@@ -62,7 +62,12 @@ class FetchNoteScreenState extends State<FetchNoteScreen> {
 
   MemoDbProvider memoDb = MemoDbProvider();
 
+  createLocalDatabases() async {
+    memoDb.init();
+  }
+
   storeNotesLocal() async {
+    await createLocalDatabases();
     print('local boi');
     int localNoteSaveCount = 0;
     int noteCount = await countUserNotes();

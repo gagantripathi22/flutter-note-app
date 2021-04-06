@@ -39,10 +39,16 @@ class SyncScreenState extends State<SyncScreen> {
   }
 
   bool isSyncProgress = false;
+
+  var lastSyncDate = "Loading";
+
   getProgressCount() async {
     final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      lastSyncDate: prefs.getString('lastSyncDate').toString();
+    });
     bool tempStatus = prefs.getBool('isSyncInProgress');
-
+    print(lastSyncDate);
     print(isSyncProgress);
     if(tempStatus) {
       setState(() {
@@ -65,9 +71,17 @@ class SyncScreenState extends State<SyncScreen> {
     });
   }
 
+  getLastSyncDate() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      lastSyncDate: prefs.getString('lastSyncDate').toString();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     InitState();
+    getLastSyncDate();
     MemoDbProvider memoDb = MemoDbProvider();
     FirestoreSync syncService = new FirestoreSync();
     return Scaffold(
@@ -170,7 +184,15 @@ class SyncScreenState extends State<SyncScreen> {
                                         ),
                                       )
                                         :
-                                        Text(' ')
+                                      Container(
+                                        margin: EdgeInsets.only(top: 10),
+                                        child: Text(
+                                          '',
+                                          style: TextStyle(
+                                            color: Colors.lightGreenAccent,
+                                          ),
+                                        ),
+                                      )
                                     // Container(
                                     //   margin: EdgeInsets.only(top: 15),
                                     //   child: Text(
@@ -207,6 +229,7 @@ class SyncScreenState extends State<SyncScreen> {
                                         FirestoreSync sc = new FirestoreSync();
                                         sc.storingInFirestore();
                                         showPleaseWait();
+                                        // getLastSyncDate();
                                       },
                                       borderRadius: BorderRadius.circular(10),
                                       child: Container(

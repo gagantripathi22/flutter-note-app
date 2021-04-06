@@ -8,11 +8,10 @@ import 'dart:async';
 class MemoDbProvider {
   Future<Database> init() async {
     Directory directory =
-        await getApplicationDocumentsDirectory(); //returns a directory which stores permanent files
+    await getApplicationDocumentsDirectory(); //returns a directory which stores permanent files
     final path = join(directory.path, "memos.db"); //create path to database
-
     return await openDatabase(
-        //open the database or create a database if there isn't any
+      //open the database or create a database if there isn't any
         path,
         version: 1, onCreate: (Database db, int version) async {
       await db.execute("""
@@ -22,8 +21,19 @@ class MemoDbProvider {
           note TEXT,
           color TEXT,
           date DATETIME)""");
+      await db.execute("""
+          CREATE TABLE unsyncNewNotes(
+          id INTEGER,
+          title TEXT,
+          note TEXT,
+          color TEXT,
+          date DATETIME)""");
+      await db.execute("""
+          CREATE TABLE unsyncDeletedNotes(
+          id INTEGER)""");
     });
   }
+
   Future<Database> deleteDatabase() async {
     Directory directory =
     await getApplicationDocumentsDirectory(); //returns a directory which stores permanent files
@@ -101,6 +111,20 @@ class MemoDbProvider {
         "where title LIKE '%" + keyword + "%' "
         "OR note LIKE '%" + keyword + "%'"
     );
+    return result.toList();
+  }
+
+  Future setUnsyncDeletedNoteId(idToAdd) async {
+    final db = await init();
+    var result = await db.rawQuery("INSERT INTO unsyncDeletedNotes values('"
+        + idToAdd + "')"
+    );
+    return result.toList();
+  }
+
+  Future getUnsyncDeletedNoteList() async {
+    final db = await init();
+    var result = await db.rawQuery('SELECT * FROM unsyncDeletedNotes');
     return result.toList();
   }
 }

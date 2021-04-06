@@ -67,8 +67,8 @@ class GoogleSignInProvider extends ChangeNotifier {
         .catchError((error) => print("Failed to add user in database: $error"));
       }
 
-      MemoDbProvider memoDb = MemoDbProvider();
-      memoDb.init();
+      // MemoDbProvider memoDb = MemoDbProvider();
+      // memoDb.init();
     }
   }
 
