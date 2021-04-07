@@ -140,4 +140,17 @@ class MemoDbProvider {
     var result = await db.rawQuery("SELECT MAX(id) from Memos");
     return result;
   }
+
+  Future emptyUnsyncDeletedNotesTable() async {
+    final db = await init();
+    var result = await db.rawQuery("DELETE FROM unsyncDeletedNotes");
+    return result;
+  }
+
+  Future getMaxDateFromNotesTable() async {
+    final db = await init();
+    var result = await db.rawQuery("SELECT MAX(Date) from Memos"
+    );
+    return result;
+  }
 }

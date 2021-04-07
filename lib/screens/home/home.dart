@@ -201,6 +201,13 @@ class HomeScreenState extends State<HomeScreen> {
     testDB();
   }
 
+  _removeSymbolsFromDate(str) {
+    String strNew = str.replaceAll("-", "");
+    strNew = strNew.replaceAll(":", "");
+    strNew = strNew.replaceAll(" ", "");
+    return strNew;
+  }
+
   _navigateToNoteScreen(context, document, index) async {
     final information = await Navigator.push(
       context,
@@ -365,12 +372,17 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   handleLogOut() async {
-    // final prefs = await SharedPreferences.getInstance();
-    // print(prefs.getString('lastSyncDate'));
+    final prefs = await SharedPreferences.getInstance();
+    // prefs.setString('lastSyncDate', '2021-04-07 00:31:43');
+    print(prefs.getString('lastSyncDate'));
+    // int temp = int.parse(_removeSymbolsFromDate("2021-04-07 00:31:43"));
+    // print(temp);
 
     MemoDbProvider memoDb = MemoDbProvider();
     List temp = await memoDb.getUnsyncDeletedNoteList();
     print(temp);
+
+
   }
 
   final user = FirebaseAuth.instance.currentUser;
@@ -475,7 +487,7 @@ class HomeScreenState extends State<HomeScreen> {
                       ));
                     provider.logout();
 
-                    handleLogOut();
+                    // handleLogOut();
                   },
                   child: Container(
                       padding: EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 15),

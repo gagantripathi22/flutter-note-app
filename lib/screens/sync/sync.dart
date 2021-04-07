@@ -40,15 +40,14 @@ class SyncScreenState extends State<SyncScreen> {
 
   bool isSyncProgress = false;
 
-  var lastSyncDate = "Loading";
+  var lastSyncDate;
 
   getProgressCount() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      lastSyncDate: prefs.getString('lastSyncDate').toString();
-    });
+    // setState(() {
+    //   lastSyncDate: prefs.getString('lastSyncDate').toString();
+    // });
     bool tempStatus = prefs.getBool('isSyncInProgress');
-    print(lastSyncDate);
     print(isSyncProgress);
     if(tempStatus) {
       setState(() {
@@ -227,8 +226,11 @@ class SyncScreenState extends State<SyncScreen> {
                                     child: InkWell(
                                       onTap: () {
                                         FirestoreSync sc = new FirestoreSync();
-                                        sc.storingInFirestore();
-                                        showPleaseWait();
+                                        // sc.storingInFirestore();
+                                        // showPleaseWait();
+
+                                        sc.newSyncProcedure();
+
                                         // getLastSyncDate();
                                       },
                                       borderRadius: BorderRadius.circular(10),

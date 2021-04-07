@@ -62,12 +62,7 @@ class FetchNoteScreenState extends State<FetchNoteScreen> {
 
   MemoDbProvider memoDb = MemoDbProvider();
 
-  createLocalDatabases() async {
-    memoDb.init();
-  }
-
   storeNotesLocal() async {
-    await createLocalDatabases();
     print('local boi');
     int localNoteSaveCount = 0;
     int noteCount = await countUserNotes();
@@ -81,6 +76,7 @@ class FetchNoteScreenState extends State<FetchNoteScreen> {
       });
       await firestoreNoteList.forEach((note) {
         final memo = Customer(
+          id: note['id'],
           title: note['title'],
           note: note['note'],
           color: note['color'],
@@ -98,6 +94,9 @@ class FetchNoteScreenState extends State<FetchNoteScreen> {
       });
 
     }
+    List maxDateLocal = await memoDb.getMaxDateFromNotesTable();
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('lastSyncDate', maxDateLocal[0]['MAX(Date)']);
   }
 
   navigateToHomeScreen() {
@@ -143,18 +142,18 @@ class FetchNoteScreenState extends State<FetchNoteScreen> {
                                       ),
                                     ),
                                     AnimatedOpacity(
-                                      opacity: fetchingNotesOpacity ? 1.0 : 0.3,
-                                      duration: Duration(milliseconds: 500),
-                                      child: Container(
-                                        padding: EdgeInsets.only(top: 10),
-                                        child: Text(
-                                          'Fetching your notes from cloud',
-                                          style: TextStyle(
-                                            color: Colors.white.withOpacity(.95),
-                                            fontSize: 16,
+                                        opacity: fetchingNotesOpacity ? 1.0 : 0.3,
+                                        duration: Duration(milliseconds: 500),
+                                        child: Container(
+                                          padding: EdgeInsets.only(top: 10),
+                                          child: Text(
+                                            'Fetching your notes from cloud',
+                                            style: TextStyle(
+                                              color: Colors.white.withOpacity(.95),
+                                              fontSize: 16,
+                                            ),
                                           ),
-                                        ),
-                                      )
+                                        )
                                     ),
                                     AnimatedOpacity(
                                         opacity: storingLocallyOpacity ? 1.0 : 0.3,
