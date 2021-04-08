@@ -216,6 +216,7 @@ class FirestoreSync {
     await deleteLocalNotesUsingFirebaseDeletedNoteId();
     await getNotesWithDateGreaterThanLastSync();
     await storeNewlyFetchedDataToLocalDatabase();
+    await setSyncProgressStatus();
   }
 
   addingIntoDatabase(currUserId) async {

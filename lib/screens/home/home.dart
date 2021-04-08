@@ -177,14 +177,6 @@ class HomeScreenState extends State<HomeScreen> {
       );
       MemoDbProvider memoDb = MemoDbProvider();
       await memoDb.addItem(memo);
-      // setState(() {
-      //   note_list.insert(0,{
-      //     "title": information['title'],
-      //     "note": information['note'],
-      //     "color": information['color'],
-      //     "date": _dateFormatter(),
-      //   });
-      // });
     }
     testDB();
   }
@@ -233,6 +225,15 @@ class HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(builder: (context) => NewNote()),
     );
     _addNewNote(information);
+  }
+
+  _navigateToSyncScreen(context) async {
+    final information = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SyncScreen()),
+    );
+    if(information['refresh'] == true)
+      testDB();
   }
 
   Widget _buildListItem(context, document, index) {
@@ -390,7 +391,7 @@ class HomeScreenState extends State<HomeScreen> {
   Widget _drawer(context) {
     return Container(
       color: Color(0xff252525),
-      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 15, ),
+      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 30, bottom: 30),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -436,10 +437,11 @@ class HomeScreenState extends State<HomeScreen> {
                 color: Color(0xff252525),
                 child: InkWell(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SyncScreen()),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(builder: (context) => SyncScreen()),
+                    // );
+                    _navigateToSyncScreen(context);
                   },
                   child: Container(
                     padding: EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 15),
