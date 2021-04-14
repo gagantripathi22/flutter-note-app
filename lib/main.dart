@@ -14,6 +14,7 @@ void main() async {
 //  MemoDbProvider memoDb = MemoDbProvider();
   final prefs = await SharedPreferences.getInstance();
   prefs.setBool('isSyncInProgress', false);
+  prefs.setDouble('syncProgress', 0);
   if (prefs.getString('lastSyncDate') == null)
     prefs.setString('lastSyncDate', '0');
   if(prefs.getBool('isLoggedIn') == null)

@@ -96,60 +96,67 @@ class _SearchState extends State<Search> {
   Widget _buildListItem(context, document, index) {
     return GestureDetector(
       child: Container(
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              _navigateToNoteScreen(context, document, index);
-            },
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 8, right: 10, left: 10),
-              padding: const EdgeInsets.only(
-                top: 15,
-                left: 15,
-                bottom: 11,
-                right: 15,
-              ),
-              constraints: BoxConstraints(
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 8, right: 10, left: 10),
+          constraints: BoxConstraints(
 //                maxHeight: 100, minHeight: 80,
-              ),
-              decoration: new BoxDecoration(
-                color: Color(int.parse(document['color'])).withOpacity(.03),
-//                border: Border.all(color: Color(0xff525252.2),
-                border: Border.all(
-                    color: Color(int.parse(document['color'])).withOpacity(.7)),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    child: Text(
-                      document['title'],
-                      style: TextStyle(
-                        // color: Color(0xff1b1c17),
-                        color: Colors.white,
-                        fontSize: 17,
+          ),
+          decoration: new BoxDecoration(
+            color: Color(int.parse(document['color'])).withOpacity(.03),
+            border: Border.all(color: Color(int.parse(document['color'])).withOpacity(.7)),
+//                 color: Color(int.parse(document['color'])).withOpacity(1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Material(
+              color: Colors.transparent,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: InkWell(
+                    onTap: () {
+                      _navigateToNoteScreen(context, document, index);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.only(
+                        top: 12,
+                        left: 15,
+                        bottom: 11,
+                        right: 15,
                       ),
-                    ),
-                  ),
-                  Container(
-                    alignment: Alignment.centerRight,
-                    margin: EdgeInsets.only(
-                      top: 5,
-                    ),
-                    child: Text(
-                      'March 7, 2020',
-                      style: TextStyle(
-                        // color: Color(0xff1b1c17).withOpacity(.5),
-                          color: Color(0xffffffff).withOpacity(.5),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w300),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Container(
+                            child: Text(
+                              document['title'],
+                              style: TextStyle(
+                                // color: Color(0xff1b1c17),
+                                  color: Colors.white,
+                                  fontSize: 17,
+                                  height: 1.4
+                              ),
+                            ),
+                          ),
+                          Container(
+                            alignment: Alignment.centerRight,
+                            margin: EdgeInsets.only(
+                              top: 5,
+                            ),
+                            child: Text(
+                              document['date'],
+                              style: TextStyle(
+                                // color: Color(0xff1b1c17).withOpacity(.5),
+                                  color: Color(0xffffffff).withOpacity(.5),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w300),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                ),
+              )
           ),
         ),
       ),
@@ -182,6 +189,7 @@ class _SearchState extends State<Search> {
                     height: 50,
                     width: MediaQuery.of(context).size.width - 80,
                     child: TextField(
+                      textCapitalization: TextCapitalization.sentences,
                       textAlignVertical: TextAlignVertical.center,
                       onChanged: ((value) {
                         // onSearchTextChanged(value);
@@ -256,7 +264,7 @@ class _SearchState extends State<Search> {
                         axisDirection: AxisDirection.down,
                         color: Colors.grey,
                         child: ListView.builder(
-                            padding: EdgeInsets.only(top: 5, bottom: 5),
+                            padding: EdgeInsets.only(top: 15, bottom: 15),
                             //                      itemExtent: 80.0,
                             itemCount: _notes.length,
                             itemBuilder: (context, index) => _buildListItem(context, _notes[index], index)

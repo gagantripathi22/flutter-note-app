@@ -4,6 +4,7 @@ import 'package:note_app/models/database_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:note_app/services/firestore_sync.dart';
 import 'dart:async';
+import 'dart:io';
 
 class SyncScreen extends StatefulWidget {
   @override
@@ -29,7 +30,7 @@ class SyncScreenState extends State<SyncScreen> {
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(Duration(seconds: 3), (Timer t) => getProgressCount());
+    timer = Timer.periodic(Duration(milliseconds: 100), (Timer t) => getProgressCount());
   }
 
   @override
@@ -41,6 +42,8 @@ class SyncScreenState extends State<SyncScreen> {
   bool isSyncProgress = false;
 
   var lastSyncDate;
+
+  double syncStatus = 0.0;
 
   getProgressCount() async {
     final prefs = await SharedPreferences.getInstance();
@@ -54,11 +57,23 @@ class SyncScreenState extends State<SyncScreen> {
         isSyncProgress = tempStatus;
       });
     }
+    
+    double syncProgress = prefs.getDouble('syncProgress');
+    print(syncProgress);
+    setState(() {
+      syncStatus = syncProgress;
+    });
+    if(syncProgress == 7.0) {
+      setState(() {
+        syncTriggered = false;
+      });
+    }
   }
 
   runOnPop() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setBool('isSyncInProgress', false);
+    prefs.setDouble('syncProgress', 0.0);
   }
 
   bool syncTriggered = false;
@@ -77,6 +92,24 @@ class SyncScreenState extends State<SyncScreen> {
     });
   }
 
+  handleSync() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        print('Internet connected');
+        FirestoreSync sc = new FirestoreSync();
+        showPleaseWait();
+        sc.newSyncProcedure();
+      }
+    } on SocketException catch (_) {
+      print('Internet not connected');
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(
+        content: Text('No internet connection'),
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     InitState();
@@ -89,6 +122,7 @@ class SyncScreenState extends State<SyncScreen> {
         Navigator.pop(context, {
           'refresh': true,
         });
+        runOnPop();
       },
       child: Scaffold(
         backgroundColor: Color(0xff252525),
@@ -177,32 +211,30 @@ class SyncScreenState extends State<SyncScreen> {
                                 child: IntrinsicHeight(
                                   child: Column(
                                     children: [
-                                      Image(
-                                        image: AssetImage('assets/images/icon-cloud_sync.png'),
-                                        color: Colors.white.withOpacity(.1),
-                                        // height: 18,
-                                        // width: 26,
+                                      Container(
+                                        margin: EdgeInsets.only(top: 100),
+                                        child: Image(
+                                          image: AssetImage('assets/images/icon-cloud_sync.png'),
+                                          color: Colors.white.withOpacity(.1),
+                                          // height: 18,
+                                          // width: 26,
+                                        ),
                                       ),
-                                      syncTriggered == true ?
-                                        Container(
-                                          margin: EdgeInsets.only(top: 10),
-                                          child: Text(
-                                            isSyncProgress ? 'Sync completed' : 'Please wait sync in progress',
-                                            style: TextStyle(
-                                              color: Colors.lightGreenAccent,
-                                            ),
-                                          ),
+                                      Container(
+                                        height: 2.5,
+                                        width: MediaQuery.of(context).size.width - 65,
+                                        color: Colors.grey,
+                                        margin: EdgeInsets.only(top: 40),
+                                        child: Stack(
+                                          children: [
+                                            Positioned(child: Container(
+                                              height: 2.5,
+                                              width: this.syncStatus * 47,
+                                              color: this.syncStatus == 7.0 ? Colors.lightGreen : Colors.white,
+                                            ))
+                                          ],
                                         )
-                                          :
-                                        Container(
-                                          margin: EdgeInsets.only(top: 10),
-                                          child: Text(
-                                            '',
-                                            style: TextStyle(
-                                              color: Colors.lightGreenAccent,
-                                            ),
-                                          ),
-                                        )
+                                      ),
                                     ],
                                   ),
                                 )
@@ -227,13 +259,7 @@ class SyncScreenState extends State<SyncScreen> {
                                       color: Colors.transparent,
                                       child: InkWell(
                                         onTap: () {
-                                          FirestoreSync sc = new FirestoreSync();
-                                          // sc.storingInFirestore();
-                                          showPleaseWait();
-
-                                          sc.newSyncProcedure();
-
-                                          // getLastSyncDate();
+                                          handleSync();
                                         },
                                         borderRadius: BorderRadius.circular(10),
                                         child: Container(

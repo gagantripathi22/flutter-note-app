@@ -97,8 +97,11 @@ class HomeScreenState extends State<HomeScreen> {
     String year = temp.substring(0, 4);
     String month = temp.substring(5, 7);
     String day = temp.substring(8, 10);
+    if(int.parse(day) < 10) {
+      day = day.substring(1, 2);
+    }
     String month2 = int.parse(month) < 10 ? '0' + month : month ;
-    String day2 = int.parse(day) < 10 ? '0' + day : day;
+    String day2 = day;
     String hour = temp.substring(11, 13);
     String minute = temp.substring(14, 16);
     String sec = temp.substring(17, 19);
@@ -112,7 +115,6 @@ class HomeScreenState extends State<HomeScreen> {
       } else {
         formattedDate = day2 + ' ' + _numMonthToWord(int.parse(month2));
       }
-    // }
     } else {
       formattedDate = day2 + ' ' + _numMonthToWord(int.parse(month2)) + ' ' + year;
     }
@@ -123,34 +125,8 @@ class HomeScreenState extends State<HomeScreen> {
     if (information['title'] != '' || information['note'] != '' || information['color'] != document['color']) {
       if(information['title'] == '') information['title'] = document['title'];
       if(information['note'] == '') information['note'] = document['note'];
-      // final memo = Customer(
-      //   id: document['id'],
-      //   title: information['title'],
-      //   note: information['note'],
-      //   color: information['color'],
-      //   date: _dateFormatter(),
-      // );
-      // MemoDbProvider memoDb = MemoDbProvider();
-      // memoDb.updateMemo(document['id'], memo);
-      // print('Returned Note Color : ' + information['color']);
-      // print('Returned Note Title : ' + information['title']);
-      // setState(() {
-      //   note_list[index] = {
-      //     "id": document['id'],
-      //     "title": information['title'],
-      //     "note": information['note'],
-      //     "color": information['color'],
-      //     "date": _dateFormatter(),
-      //   };
-      // });
-
       MemoDbProvider memoDb = new MemoDbProvider();
-      // setState(() {
-      //   note_list.removeAt(index);
-      // });
-      // print('is removed');
-      // memoDb.deleteNoteParticular(information['id'].toString());
-      _deleteNote(information, index);
+      _deleteNote(document, index);
       await _addNewNote({
         'title': information['title'],
         'note': information['note'],
@@ -184,7 +160,7 @@ class HomeScreenState extends State<HomeScreen> {
   _deleteNote(information, index) async {
     MemoDbProvider memoDb = MemoDbProvider();
     await memoDb.deleteMemo(information['id']);
-    await memoDb.setUnsyncDeletedNoteId(information['id'].toString());
+    await memoDb.setUnsyncDeletedNoteId(information['id'].toString(), information['date'].toString());
 
     setState(() {
       note_list.removeAt(index);
@@ -236,72 +212,135 @@ class HomeScreenState extends State<HomeScreen> {
       testDB();
   }
 
+  showLogoutAlertDialog(context) async {
+    Widget cancelButton = FlatButton(
+      child: Text(
+        "Cancel",
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      onPressed:  () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget syncButton = FlatButton(
+      child: Text(
+        "Sync",
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      onPressed:  () {
+        // Navigator.pop(context);
+        _navigateToSyncScreen(context);
+      },
+    );
+    Widget deleteButton = FlatButton(
+      child: Text(
+        "Log out",
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      onPressed:  () {
+        handleLogOut(context);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text(
+        "Log out",
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      content: Text(
+        "Are you sure you want to log out? All unsynced note will be deleted permanently.",
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      actions: [
+        cancelButton,
+        syncButton,
+        deleteButton,
+      ],
+      elevation: 24.0,
+      backgroundColor: Color(0xff252525),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+    );
+
+    // show the dialog
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   Widget _buildListItem(context, document, index) {
     return GestureDetector(
       child: Container(
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 8, right: 10, left: 10),
-              constraints: BoxConstraints(
-//                maxHeight: 100, minHeight: 80,
-              ),
-              decoration: new BoxDecoration(
-                color: Color(int.parse(document['color'])).withOpacity(.03),
-//                border: Border.all(color: Color(0xff525252.2),
-                border: Border.all(
-                    color: Color(int.parse(document['color'])).withOpacity(.7)),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Material(
-                color: Colors.transparent,
+        margin: const EdgeInsets.only(bottom: 8, right: 10, left: 10),
+        decoration: new BoxDecoration(
+          color: Color(int.parse(document['color'])).withOpacity(.03),
+          border: Border.all(color: Color(int.parse(document['color'])).withOpacity(.7)),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: InkWell(
+                onTap: () {
+                  _navigateToNoteScreen(context, document, index);
+                },
                 child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
+                  padding: const EdgeInsets.only(
+                    top: 12,
+                    left: 15,
+                    bottom: 11,
+                    right: 15,
                   ),
-                  child: InkWell(
-                      onTap: () {
-                        _navigateToNoteScreen(context, document, index);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.only(
-                          top: 12,
-                          left: 15,
-                          bottom: 11,
-                          right: 15,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        child: Text(
+                          document['title'],
+                          style: TextStyle(
+                            // color: Color(0xff1b1c17),
+                              color: Colors.white,
+                              fontSize: 17,
+                              height: 1.4
+                          ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Container(
-                              child: Text(
-                                document['title'],
-                                style: TextStyle(
-                                  // color: Color(0xff1b1c17),
-                                    color: Colors.white,
-                                    fontSize: 17,
-                                    height: 1.4
-                                ),
-                              ),
-                            ),
-                            Container(
-                              alignment: Alignment.centerRight,
-                              margin: EdgeInsets.only(
-                                top: 5,
-                              ),
-                              child: Text(
-                                _getFormatDDMonthYYYY(document['date']),
-                                style: TextStyle(
-                                  // color: Color(0xff1b1c17).withOpacity(.5),
-                                    color: Color(0xffffffff).withOpacity(.5),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w300),
-                              ),
-                            ),
-                          ],
+                      ),
+                      Container(
+                        alignment: Alignment.centerRight,
+                        margin: EdgeInsets.only(
+                          top: 5,
                         ),
-                      )
+                        child: Text(
+                          _getFormatDDMonthYYYY(document['date']),
+                          style: TextStyle(
+                            // color: Color(0xff1b1c17).withOpacity(.5),
+                              color: Color(0xffffffff).withOpacity(.5),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300),
+                        ),
+                      ),
+                    ],
                   ),
                 )
-          ),
+            ),
+          )
         ),
       ),
     );
@@ -372,18 +411,25 @@ class HomeScreenState extends State<HomeScreen> {
     print(temp_list.length);
   }
 
-  handleLogOut() async {
-    final prefs = await SharedPreferences.getInstance();
-    // prefs.setString('lastSyncDate', '2021-04-07 00:31:43');
-    print(prefs.getString('lastSyncDate'));
-    // int temp = int.parse(_removeSymbolsFromDate("2021-04-07 00:31:43"));
+  handleLogOut(context) async {
+    // final prefs = await SharedPreferences.getInstance();
+    // // prefs.setString('lastSyncDate', '2021-04-07 00:31:43');
+    // print(prefs.getString('lastSyncDate'));
+    // // int temp = int.parse(_removeSymbolsFromDate("2021-04-07 00:31:43"));
+    // // print(temp);
+    //
+    // MemoDbProvider memoDb = MemoDbProvider();
+    // await memoDb.deleteDeletedNotesTableOnLogout();
+    // await memoDb.deleteNotesTableOnLogout();
+    // List temp = await memoDb.getUnsyncDeletedNoteList();
     // print(temp);
 
-    MemoDbProvider memoDb = MemoDbProvider();
-    List temp = await memoDb.getUnsyncDeletedNoteList();
-    print(temp);
-
-
+    GoogleSignInProvider provider = new GoogleSignInProvider();
+    await provider.logout();
+    Navigator.pushReplacement (
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()
+        ));
   }
 
   final user = FirebaseAuth.instance.currentUser;
@@ -396,35 +442,49 @@ class HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: EdgeInsets.only(left: 12, right: 12, bottom: 20),
-            child: Row(
+            padding: EdgeInsets.only(left: 19, right: 19, bottom: 20),
+            child: Column(
               children: [
-                CircleAvatar(
-                  maxRadius: 27,
-                  backgroundImage: NetworkImage(user.photoURL),
-                ),
-                Container(
-                  padding: EdgeInsets.only(left: 10),
+                Align(
+                  alignment: Alignment.bottomLeft,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        user.displayName,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: CircleAvatar(
+                          maxRadius: 32,
+                          backgroundImage: NetworkImage(user.photoURL),
                         ),
                       ),
-                      Container(
-                        margin: EdgeInsets.only(top: 5),
-                        child: Text(
-                          user.email,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(.6),
-                            fontSize: 12,
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          margin: EdgeInsets.only(top: 20),
+                          // padding: EdgeInsets.only(left: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                user.displayName,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(top: 5),
+                                child: Text(
+                                  user.email,
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(.6),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
+                      )
                     ],
                   ),
                 )
@@ -433,6 +493,7 @@ class HomeScreenState extends State<HomeScreen> {
           ),
           GestureDetector(
             child: Container(
+              margin: EdgeInsets.only(top: 17),
               child: Material(
                 color: Color(0xff252525),
                 child: InkWell(
@@ -476,20 +537,18 @@ class HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
+          Container(
+            height: .5,
+            color: Color(0xff575757),
+            margin: EdgeInsets.only(left: 19, right: 29),
+          ),
           GestureDetector(
             child: Container(
               child: Material(
                 color: Color(0xff252525),
                 child: InkWell(
                   onTap: () {
-                    GoogleSignInProvider provider = new GoogleSignInProvider();
-                    Navigator.push (
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()
-                      ));
-                    provider.logout();
-
-                    // handleLogOut();
+                    showLogoutAlertDialog(context);
                   },
                   child: Container(
                       padding: EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 15),
@@ -643,9 +702,6 @@ class HomeScreenState extends State<HomeScreen> {
                       bottom: 7,
                       right: 0,
                       child: OpenContainer(
-//                                  closedBuilder: (context, action) (
-//                                    _buildListItem(context, snapshot.data.docs[index]),
-//                                  ),
                                   closedColor: Color(0xff252525),
                                   closedElevation: 0,
                                   transitionDuration: Duration(milliseconds: 350),

@@ -75,6 +75,80 @@ class _NoteScreenState extends State<NoteScreen> {
   ];
 
   // NoteList nl = NoteList();
+  showDeleteAlertDialog(context) async {
+    Widget cancelButton = FlatButton(
+      child: Text(
+        "Cancel",
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      onPressed:  () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget deleteButton = FlatButton(
+      child: Text(
+        "Delete",
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      onPressed:  () {
+        handleOnDelete(context);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text(
+        "Delete",
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      content: Text(
+        "Are you sure you want to delete the note?",
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      actions: [
+        cancelButton,
+        deleteButton,
+      ],
+      elevation: 24.0,
+      backgroundColor: Color(0xff252525),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+    );
+
+    // show the dialog
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  handleOnDelete(context) async {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(
+      content: Text('Note Deleted'),
+    ));
+    // deleteNote();
+    Navigator.of(context).pop();
+    Navigator.pop(context, {
+      'id': widget.note_id,
+      'title': title,
+      'note': note,
+      'color': selectedNoteColor,
+      'isDelete': true,
+      'noteIndex': widget.id_in_list,
+      'date': widget.date,
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -246,20 +320,7 @@ class _NoteScreenState extends State<NoteScreen> {
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(12),
                                 onTap: () {
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(SnackBar(
-                                    content: Text('Note Deleted'),
-                                  ));
-                                  // deleteNote();
-                                  Navigator.pop(context, {
-                                    'id': widget.note_id,
-                                    'title': title,
-                                    'note': note,
-                                    'color': selectedNoteColor,
-                                    'isDelete': true,
-                                    'noteIndex': widget.id_in_list,
-                                    'date': widget.date,
-                                  });
+                                  showDeleteAlertDialog(context);
                                 },
                                 child: Container(
                                   height: 36,
@@ -297,11 +358,12 @@ class _NoteScreenState extends State<NoteScreen> {
                       child: Column(
                         children: <Widget>[
                           Container(
-                              padding: EdgeInsets.only(right: 10),
+                              padding: EdgeInsets.only(right: 50),
                               alignment: Alignment.topLeft,
                               child: TextField(
                                 controller: _titleController,
                                 maxLines: null,
+                                textCapitalization: TextCapitalization.sentences,
                                 onChanged: (text) {
                                   setState(() {
                                     title = text;
@@ -324,7 +386,7 @@ class _NoteScreenState extends State<NoteScreen> {
                             child: Text(
                               // date == null ? 'Loading': 'Edited on ' + date,
                               // widget.note_id.toString(),
-                              'Edited on ' + widget.note_id.toString(),
+                              'Edited on ' + widget.date,
                               style: TextStyle(
                                   fontSize: 15,
                                   color: Colors.white.withOpacity(.7),
@@ -337,6 +399,7 @@ class _NoteScreenState extends State<NoteScreen> {
                             child: TextField(
                               controller: _noteController,
                               maxLines: null,
+                              textCapitalization: TextCapitalization.sentences,
                               onChanged: (text) {
                                 setState(() {
                                   note = text;

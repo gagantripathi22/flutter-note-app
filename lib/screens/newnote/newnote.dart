@@ -262,6 +262,7 @@ class _NewNoteState extends State<NewNote> {
                               child: TextField(
                                 // controller: _titleController,
                                 maxLines: null,
+                                textCapitalization: TextCapitalization.sentences,
                                 onChanged: (text) {
                                   setState(() {
                                     title = text;
@@ -284,6 +285,7 @@ class _NewNoteState extends State<NewNote> {
                             child: TextField(
                               // controller: _noteController,
                               maxLines: null,
+                              textCapitalization: TextCapitalization.sentences,
                               onChanged: (text) {
                                 setState(() {
                                   note = text;

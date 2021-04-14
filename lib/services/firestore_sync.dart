@@ -74,7 +74,10 @@ class FirestoreSync {
     List unsyncDeletedNotesList = await getUnsyncDeletedNotes();
     await unsyncDeletedNotesList.forEach((unsyncDeleted) {
       ref.doc(currUserId).collection('deletedNoteId').add(
-        {'id' : unsyncDeleted['id']}
+        {
+          'id' : unsyncDeleted['id'],
+          'date' : unsyncDeleted['date'],
+        }
       );
     });
 
@@ -162,7 +165,7 @@ class FirestoreSync {
           title: element['title'],
           note: element['note'],
           color: element['color'],
-          date: _dateFormatter(),
+          date: element['date'],
         )
       );
     });
@@ -179,22 +182,10 @@ class FirestoreSync {
     CollectionReference ref = FirebaseFirestore.instance.collection('data');
     List localNotesList = await getLocalDatabase();
 
-    // await unsyncDeletedNotesList.forEach((unsyncDeleted) {
-    //   ref.doc(currUserId).collection('deletedNoteId').get().then((snapshot) {
-    //     for (DocumentSnapshot ds in snapshot.docs) {
-    //       if (unsyncDeleted['id'] == ds.data()['id'])
-    //         memoDb.deleteMemo(int.parse(ds.data()['id']));
-    //     }
-    //   }).then((value) {
-    //     // addingIntoDatabase(currUserId);
-    //   });
-    // });
-
     ref.doc(currUserId).collection('deletedNoteId').get().then((snapshot) {
       for (DocumentSnapshot ds in snapshot.docs) {
         localNotesList.forEach((element) {
-          // print(element['id'].toString() + "----"  + ds.data()['id'].toString());
-          if (element['id'].toString() == ds.data()['id'].toString())
+          if (element['id'].toString() == ds.data()['id'].toString() && element['date'] == ds.data()['date'])
             memoDb.deleteMemo(ds.data()['id']);
         });
 
@@ -209,14 +200,30 @@ class FirestoreSync {
   // memoDb.deleteMemo(int.parse(ds.data()['id']));
   // }
 
+  emptyLocalDeletedNotesTable() async {
+    MemoDbProvider memoDb = new MemoDbProvider();
+    memoDb.emptyUnsyncDeletedNotesTable();
+  }
+
   newSyncProcedure() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setDouble('syncProgress', 0);
     await addUnsyncDeletedNotesToFirestore();
+    prefs.setDouble('syncProgress', 1);
     await deleteUnsyncDeletedNotesFromFirestore();
+    prefs.setDouble('syncProgress', 2);
     await setNotesWithDateGreaterThanLastSync();
+    prefs.setDouble('syncProgress', 3);
     await deleteLocalNotesUsingFirebaseDeletedNoteId();
+    prefs.setDouble('syncProgress', 4);
     await getNotesWithDateGreaterThanLastSync();
+    prefs.setDouble('syncProgress', 5);
     await storeNewlyFetchedDataToLocalDatabase();
+    prefs.setDouble('syncProgress', 6);
+    await emptyLocalDeletedNotesTable();
+    prefs.setDouble('syncProgress', 7);
     await setSyncProgressStatus();
+    // prefs.setDouble('syncProgress', 0);
   }
 
   addingIntoDatabase(currUserId) async {

@@ -22,15 +22,9 @@ class MemoDbProvider {
           color TEXT,
           date DATETIME)""");
       await db.execute("""
-          CREATE TABLE unsyncNewNotes(
-          id INTEGER,
-          title TEXT,
-          note TEXT,
-          color TEXT,
-          date DATETIME)""");
-      await db.execute("""
           CREATE TABLE unsyncDeletedNotes(
-          id INTEGER)""");
+          id INTEGER,
+          date DATETIME)""");
     });
   }
 
@@ -114,10 +108,10 @@ class MemoDbProvider {
     return result.toList();
   }
 
-  Future setUnsyncDeletedNoteId(idToAdd) async {
+  Future setUnsyncDeletedNoteId(idToAdd, date) async {
     final db = await init();
     var result = await db.rawQuery("INSERT INTO unsyncDeletedNotes values('"
-        + idToAdd + "')"
+        + idToAdd + "', '" + date + "')"
     );
     return result.toList();
   }
@@ -152,5 +146,17 @@ class MemoDbProvider {
     var result = await db.rawQuery("SELECT MAX(Date) from Memos"
     );
     return result;
+  }
+
+  Future deleteDeletedNotesTableOnLogout() async {
+    final db = await init();
+    var tab1 = await db.rawQuery("DROP TABLE IF EXISTS unsyncDeletedNotes");
+    return tab1;
+  }
+
+  Future deleteNotesTableOnLogout() async {
+    final db = await init();
+    var tab2 = await db.rawQuery("DROP TABLE IF EXISTS memos");
+    return tab2;
   }
 }
