@@ -15,10 +15,15 @@ User-friendly note-taking application built with Flutter, enabling seamless note
 ## Running the Project
 
 - Clone this project
+  
   `git clone < project-url.git >`
+
   
 - Install dependencies
+  
   `flutter pub get`
   
+  
 - Run
+  
   `flutter run`
