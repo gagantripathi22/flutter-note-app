@@ -1,16 +1,24 @@
-# note_app
+# flutter-note-app
 
-A new Flutter project.
+User-friendly note-taking application built with Flutter, enabling seamless note sync, signup and login using Firebase and Firebase Authentication
 
-## Getting Started
+## Preview
 
-This project is a starting point for a Flutter application.
+![flutter_note_app_screenshot](https://firebasestorage.googleapis.com/v0/b/gagan1337-a73b1.appspot.com/o/v2_paper_notes.webp?alt=media&token=601cd61e-db30-46a5-bdd9-b80d522db08a)
 
-A few resources to get you started if this is your first Flutter project:
+## Prerequisites
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+- Flutter SDK
+- Android Studio
+- Android SDK
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Running the Project
+
+- Clone this project
+  `git clone < project-url.git >`
+  
+- Install dependencies
+  `flutter pub get`
+  
+- Run
+  `flutter run`
